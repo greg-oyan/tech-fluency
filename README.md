@@ -1,0 +1,33 @@
+# Tech Fluency in 60 Minutes
+
+A compact, interactive training for non-engineers who work with software teams. No coding required — just the mental models you need to be useful in technical conversations.
+
+## Who This Is For
+
+- Product managers, designers, and business leaders who collaborate with engineers
+- Founders and operators building or directing technical products
+- Anyone who wants to understand how software gets built without learning to code
+
+## What You'll Learn
+
+The training covers 20 lessons across 5 modules:
+
+1. **What Software Actually Is** — State, logic, and interface. Frontend vs backend. How web apps work. The building blocks (HTML, CSS, JavaScript).
+2. **How Software Gets Built** — Git and version control. Branches, commits, and pull requests. Local vs deployed environments. Why estimates are always wrong.
+3. **The Stuff That Makes It Hard** — APIs. Databases and persistence. Permissions and edge cases. Technical debt.
+4. **AI Products Are Still Software** — Probabilistic models vs deterministic systems. Prompts, workflows, and agents. Retrieval, structured output, and tools. Why demos lie and products are hard.
+5. **How to Talk to Technical People** — Good questions vs bad questions. Signals that build or destroy credibility. Knowing when you're out of your depth.
+
+## Features
+
+- Dark editorial theme designed for focused reading
+- Sidebar navigation with module and lesson progress tracking
+- Mark-complete per lesson with progress saved to localStorage
+- Inline SVG diagrams for key concepts
+- Keyboard navigation (arrow keys, j/k, spacebar)
+- Mobile responsive with hamburger menu
+- Single HTML file — no build step, no dependencies
+
+## Live Site
+
+[greg-oyan.github.io/tech-fluency-60](https://greg-oyan.github.io/tech-fluency-60)
