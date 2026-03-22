@@ -1,6 +1,9 @@
 # Tech Fluency in 60 Minutes
 
-A compact, interactive training for non-engineers who work with software teams. No coding required — just the mental models you need to be useful in technical conversations.
+An interactive training app for non-engineers who need to work effectively with software teams. Built to teach the mental models behind modern software, AI products, and technical collaboration — without requiring anyone to learn to code.
+
+## Why I Built This
+Most nontechnical professionals are told to “learn to code” when what they actually need is technical fluency: the ability to understand how software works, ask better questions, and contribute more effectively in product, strategy, and operational conversations. I built this app to make that fluency accessible in a compact, usable format.
 
 ## Who This Is For
 
