@@ -3,7 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tech Fluency — The Complete Edition</title>
+<title>Technical Fluency for Non-Engineers</title>
+<meta property="og:title" content="Technical Fluency for Non-Engineers">
+<meta property="og:description" content="The complete guide to understanding software, infrastructure, data, AI, and how to work effectively with technical teams. 10 modules, 42 lessons, interactive quizzes and scenarios. No coding required.">
+<meta property="og:type" content="website">
+<meta name="description" content="Interactive technical fluency training for non-engineers. 10 modules covering software, infrastructure, cloud, data, AI, security, product management, and working with technical teams.">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -837,7 +841,7 @@ kbd {
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
     <div class="sidebar-brand">Complete Edition</div>
-    <div class="sidebar-title">Tech Fluency</div>
+    <div class="sidebar-title">Technical Fluency for Non-Engineers</div>
   </div>
   <div class="progress-bar-container">
     <div class="progress-label">
@@ -858,7 +862,7 @@ kbd {
       <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
     </svg>
   </button>
-  <div class="topbar-title">Tech Fluency</div>
+  <div class="topbar-title">Technical Fluency for Non-Engineers</div>
   <div class="topbar-progress" id="topbar-progress">0%</div>
 </div>
 
@@ -1747,7 +1751,7 @@ function renderLanding(el) {
   el.innerHTML = `
     <div class="lesson-content landing">
       <div class="landing-icon">&#128218;</div>
-      <h1>Tech Fluency</h1>
+      <h1>Technical Fluency for Non-Engineers</h1>
       <p>The complete guide to understanding software, infrastructure, data, AI, and how to work effectively with technical teams. No coding required.</p>
       <button class="btn-nav primary" onclick="startOrResume()">
         ${done > 0 ? 'Resume where you left off' : 'Start learning'} →
@@ -1755,6 +1759,7 @@ function renderLanding(el) {
       <div class="landing-stats">
         <span><strong>10</strong> Modules</span>
         <span><strong>42</strong> Lessons</span>
+        <span><strong>&#10003;</strong> Interactive Quizzes & Scenarios</span>
       </div>
     </div>
   `;
@@ -1937,7 +1942,7 @@ function renderCompletion(el) {
         </svg>
       </div>
       <h1>Course Complete</h1>
-      <p>You've completed Tech Fluency — The Complete Edition. You now have the conceptual vocabulary to understand, discuss, and make decisions about modern software.</p>
+      <p>You've completed Technical Fluency for Non-Engineers — The Complete Edition. You now have the conceptual vocabulary to understand, discuss, and make decisions about modern software.</p>
       <p>One person can carry an idea all the way to reality. Now you know enough about the machinery to do it.</p>
       <button class="btn-nav primary" onclick="navigateTo({type:'landing'})">Back to overview</button>
     </div>
