@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Technical Fluency for Non-Engineers</title>
+<title>Tech Fluency — The Complete Edition</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -23,6 +23,12 @@
   --green: #4ade80;
   --green-dim: #22c55e;
   --green-glow: rgba(34, 197, 94, 0.15);
+  --amber: #f59e0b;
+  --amber-dim: #d97706;
+  --amber-glow: rgba(245, 158, 11, 0.12);
+  --red: #f87171;
+  --red-dim: #ef4444;
+  --red-glow: rgba(239, 68, 68, 0.15);
   --sidebar-w: 300px;
   --transition: 200ms ease;
 }
@@ -131,30 +137,61 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--text-muted);
-  cursor: default;
+  cursor: pointer;
   display: flex;
   align-items: center;
   gap: 8px;
+  user-select: none;
+  transition: color var(--transition);
 }
 
-.module-number {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  border-radius: 4px;
-  background: var(--border);
-  color: var(--text-secondary);
-  font-size: 0.65rem;
-  font-weight: 700;
+.module-header:hover { color: var(--text-secondary); }
+
+.module-progress-ring {
   flex-shrink: 0;
 }
 
-.module-number.done {
-  background: var(--green-glow);
-  color: var(--green);
+.module-progress-ring circle.track {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 2;
 }
+
+.module-progress-ring circle.fill {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.4s ease, stroke 0.3s ease;
+  transform: rotate(-90deg);
+  transform-origin: center;
+}
+
+.module-progress-ring.done circle.fill {
+  stroke: var(--green);
+}
+
+.module-title-text { flex: 1; }
+
+.module-time {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+.module-badge {
+  display: none;
+  color: var(--amber);
+  font-size: 0.65rem;
+}
+
+.module-badge.show { display: inline; }
+
+.module-lessons { overflow: hidden; transition: max-height 0.3s ease; }
+.module-lessons.collapsed { max-height: 0 !important; }
 
 .lesson-btn {
   display: flex;
@@ -219,6 +256,12 @@ body {
 
 .lesson-label { flex: 1; }
 
+.lesson-btn .quiz-icon,
+.lesson-btn .scenario-icon {
+  font-size: 0.7rem;
+  opacity: 0.6;
+}
+
 /* ── Main ── */
 .main {
   margin-left: var(--sidebar-w);
@@ -227,7 +270,7 @@ body {
   flex-direction: column;
 }
 
-/* Top bar */
+/* Top bar (mobile) */
 .topbar {
   display: none;
   position: fixed;
@@ -255,7 +298,6 @@ body {
 }
 
 .hamburger:hover { background: var(--bg-hover); }
-
 .hamburger svg { width: 20px; height: 20px; }
 
 .topbar-title {
@@ -298,7 +340,7 @@ body {
 .content-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
 .content {
-  max-width: 900px;
+  max-width: 680px;
   width: 100%;
 }
 
@@ -335,8 +377,8 @@ body {
 .lesson-body p {
   color: var(--text-secondary);
   margin-bottom: 28px;
-  font-size: 1.15rem;
-  line-height: 1.75;
+  font-size: 1.08rem;
+  line-height: 1.8;
 }
 
 .lesson-body p:last-child { margin-bottom: 0; }
@@ -368,32 +410,204 @@ body {
   padding: 20px 24px;
   margin: 32px 0;
   border-radius: 0 8px 8px 0;
-  font-size: 1.05rem;
+  font-size: 1.02rem;
   color: var(--text-secondary);
   line-height: 1.75;
 }
+
+.callout strong { color: var(--text); }
 
 .callout.tip {
   border-left-color: var(--green-dim);
 }
 
-/* Diagrams */
-.diagram {
-  margin: 36px 0;
-  padding: 28px 20px;
+/* Quiz styles */
+.quiz-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 12px;
-  overflow-x: auto;
+  padding: 32px;
+  margin: 32px 0;
 }
 
-.diagram svg {
-  display: block;
-  margin: 0 auto;
-  width: 100%;
-  height: auto;
-  max-width: 580px;
+.quiz-card h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 20px;
 }
+
+.quiz-question {
+  margin-bottom: 32px;
+}
+
+.quiz-question:last-child { margin-bottom: 0; }
+
+.quiz-question p {
+  font-size: 1.02rem;
+  color: var(--text-secondary);
+  margin-bottom: 14px;
+  line-height: 1.7;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quiz-option {
+  padding: 12px 16px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all var(--transition);
+  text-align: left;
+  line-height: 1.5;
+}
+
+.quiz-option:hover:not(.selected) {
+  border-color: var(--accent-dim);
+  color: var(--text);
+}
+
+.quiz-option.correct {
+  border-color: var(--green-dim);
+  background: var(--green-glow);
+  color: var(--green);
+  cursor: default;
+  animation: correctPulse 0.4s ease;
+}
+
+.quiz-option.incorrect {
+  border-color: var(--red-dim);
+  background: var(--red-glow);
+  color: var(--red);
+  cursor: default;
+  animation: shake 0.4s ease;
+}
+
+.quiz-option.revealed {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.quiz-option.revealed.correct {
+  opacity: 1;
+  border-color: var(--green-dim);
+  background: var(--green-glow);
+  color: var(--green);
+}
+
+.quiz-explanation {
+  margin-top: 12px;
+  padding: 12px 16px;
+  background: var(--bg);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  display: none;
+}
+
+.quiz-explanation.show { display: block; }
+
+@keyframes correctPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+/* Scenario styles */
+.scenario-card {
+  background: linear-gradient(135deg, rgba(245,158,11,0.06), rgba(245,158,11,0.02));
+  border-left: 3px solid var(--amber-dim);
+  border-radius: 0 12px 12px 0;
+  padding: 28px 28px;
+  margin: 32px 0;
+}
+
+.scenario-card h3 {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--amber);
+  margin-bottom: 16px;
+}
+
+.scenario-card .scenario-situation {
+  font-size: 1.02rem;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+  line-height: 1.75;
+}
+
+.scenario-card .scenario-prompt {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.scenario-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.scenario-option {
+  padding: 12px 16px;
+  background: rgba(245,158,11,0.05);
+  border: 1px solid rgba(245,158,11,0.15);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all var(--transition);
+  text-align: left;
+  line-height: 1.5;
+}
+
+.scenario-option:hover:not(.selected) {
+  border-color: var(--amber-dim);
+  color: var(--text);
+}
+
+.scenario-option.selected {
+  border-color: var(--amber);
+  background: var(--amber-glow);
+  color: var(--amber);
+  cursor: default;
+}
+
+.scenario-option.revealed {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.scenario-explanation {
+  margin-top: 16px;
+  padding: 16px;
+  background: var(--bg-card);
+  border-radius: 8px;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  display: none;
+}
+
+.scenario-explanation.show { display: block; }
+.scenario-explanation strong { color: var(--text); }
 
 /* Actions */
 .lesson-actions {
@@ -501,6 +715,18 @@ body {
   font-size: 0.95rem;
 }
 
+.landing-stats {
+  display: flex;
+  justify-content: center;
+  gap: 36px;
+  margin-top: 40px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.landing-stats span { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.landing-stats strong { color: var(--text-secondary); font-size: 1.3rem; }
+
 /* Completion screen */
 .completion {
   text-align: center;
@@ -539,7 +765,6 @@ body {
   margin-top: 24px;
 }
 
-/* Key combo badge */
 kbd {
   display: inline-block;
   padding: 2px 6px;
@@ -578,17 +803,26 @@ kbd {
   }
 
   .lesson-body p {
-    font-size: 1.02rem;
+    font-size: 1rem;
   }
 
   .lesson-actions {
     flex-wrap: wrap;
-    margin-bottom: 120px;
   }
 
-  .lesson-content {
-    padding-bottom: 120px;
+  .landing h1 { font-size: 1.7rem; }
+  .landing p { font-size: 1rem; }
+  .landing-stats { gap: 24px; }
+  .landing-stats strong { font-size: 1.1rem; }
+}
+
+@media (max-width: 480px) {
+  .content-scroll {
+    padding: 20px 16px 140px;
   }
+
+  .quiz-card { padding: 20px 16px; }
+  .scenario-card { padding: 20px 16px; }
 }
 </style>
 </head>
@@ -597,628 +831,1227 @@ kbd {
 <!-- Sidebar -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
-    <div class="sidebar-brand">Interactive Guide</div>
-    <div class="sidebar-title">Technical Fluency for Non-Engineers</div>
+    <div class="sidebar-brand">Complete Edition</div>
+    <div class="sidebar-title">Tech Fluency</div>
   </div>
   <div class="progress-bar-container">
     <div class="progress-label">
-      <span>Progress</span>
-      <span id="progressPct">0%</span>
+      <span>Overall Progress</span>
+      <span id="progress-pct">0%</span>
     </div>
     <div class="progress-track">
-      <div class="progress-fill" id="progressFill"></div>
+      <div class="progress-fill" id="progress-fill"></div>
     </div>
   </div>
-  <nav class="sidebar-nav" id="sidebarNav"></nav>
+  <nav class="sidebar-nav" id="sidebar-nav"></nav>
 </aside>
 
-<!-- Mobile topbar -->
-<header class="topbar" id="topbar">
-  <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+<!-- Mobile top bar -->
+<div class="topbar" id="topbar">
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
   </button>
-  <span class="topbar-title">Tech Fluency</span>
-  <span class="topbar-progress" id="topbarPct">0%</span>
-</header>
+  <div class="topbar-title">Tech Fluency</div>
+  <div class="topbar-progress" id="topbar-progress">0%</div>
+</div>
 
-<!-- Overlay -->
 <div class="overlay" id="overlay"></div>
 
 <!-- Main content -->
 <main class="main">
-  <div class="content-scroll">
-    <div class="content" id="contentArea"></div>
+  <div class="content-scroll" id="content-scroll">
+    <div class="content" id="content"></div>
   </div>
 </main>
 
 <script>
-// ── Data ──
+// ═══════════════════════════════════════════════════════
+// DATA: All modules, lessons, quizzes, and scenarios
+// ═══════════════════════════════════════════════════════
+
 const MODULES = [
-  {
-    title: "What Software Actually Is",
-    lessons: [
-      {
-        title: "Software is state + logic + interface",
-        body: `<p>Every piece of software does three things: it <strong>remembers things</strong> (state), <strong>makes decisions</strong> (logic), and <strong>shows you something</strong> (interface). That's the whole game. Every app you've ever used — from a banking app to a video game to a spreadsheet — is doing some combination of those three things, over and over, very fast.</p>
-<p><strong>State</strong> is what the software currently knows. The email sitting in your inbox is state. The number in cell B7 of your spreadsheet is state. Whether you're logged in or logged out — that's state. When someone says "it's a state management issue," they mean the software is losing track of something it should remember, or remembering something it should have forgotten.</p>
-<p><strong>Logic</strong> is the decision-making layer. When Gmail puts a message in spam, that's logic. When your bank app rejects a transfer because your balance is too low, that's logic. Logic is the set of rules that determine what happens when. The rules can be simple ("if the password is wrong, show an error") or extraordinarily complex ("given these 47 signals, predict whether this transaction is fraudulent"). But it's all rules acting on state.</p>
-<p><strong>Interface</strong> is what the user actually sees and touches. Buttons, screens, text, charts, animations, error messages, loading spinners. The interface translates the software's internal reality into something a human can perceive and interact with. A beautiful interface on top of bad logic is lipstick on a pig. Brilliant logic behind a confusing interface is wasted intelligence.</p>
-<p>Here's why this matters for you: when something goes wrong in software, the problem is almost always in one of these three layers. The data is wrong (state). The rules are wrong (logic). Or the user can't tell what's happening (interface). If you can identify which layer is broken, you're already more useful in a technical conversation than most nontechnical people. You don't need to fix it — you need to point at the right layer.</p>
-<div class="callout tip"><strong>Key principle:</strong> Most apps are state machines with a user interface. You do something, the state changes, the app updates accordingly. Once you see this pattern, software stops feeling like magic and starts feeling like plumbing — complex plumbing, but plumbing.</div>`
-      },
-      {
-        title: "Frontend vs backend",
-        body: `<p>When you use a web app, you're interacting with two different worlds at once, and the boundary between them is one of the most important concepts in software.</p>
-<p>The <strong>frontend</strong> is everything that runs in your browser — the layout, buttons, animations, text, images, menus, and interactions you can see and touch. When you click a button and a menu slides open, that's frontend code running on your machine. The frontend's job is to make the experience feel smooth, clear, and responsive.</p>
-<p>The <strong>backend</strong> is everything that runs on a server somewhere else. When you log in, the backend checks your password. When you search for flights, the backend queries a database. When you upload a document, the backend stores it. The backend handles things the user should never see: database queries, authentication, business rules, integrations with other systems, security checks, and data processing.</p>
-<div class="diagram">
-<svg viewBox="0 0 580 160" fill="none" xmlns="http://www.w3.org/2000/svg">
-<defs>
-<marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#818cf8"/></marker>
-<marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#4ade80"/></marker>
-</defs>
-<rect x="16" y="20" width="176" height="120" rx="10" fill="#16162a" stroke="#6366f1" stroke-width="1.5"/>
-<text x="104" y="56" text-anchor="middle" fill="#818cf8" font-size="10" font-weight="700" font-family="system-ui, sans-serif" letter-spacing="0.1em">FRONTEND</text>
-<text x="104" y="80" text-anchor="middle" fill="#e4e4e7" font-size="15" font-weight="600" font-family="system-ui, sans-serif">Browser</text>
-<text x="104" y="105" text-anchor="middle" fill="#71717a" font-size="11" font-family="system-ui, sans-serif">What users see</text>
-<rect x="388" y="20" width="176" height="120" rx="10" fill="#162a16" stroke="#22c55e" stroke-width="1.5"/>
-<text x="476" y="56" text-anchor="middle" fill="#4ade80" font-size="10" font-weight="700" font-family="system-ui, sans-serif" letter-spacing="0.1em">BACKEND</text>
-<text x="476" y="80" text-anchor="middle" fill="#e4e4e7" font-size="15" font-weight="600" font-family="system-ui, sans-serif">Server</text>
-<text x="476" y="105" text-anchor="middle" fill="#71717a" font-size="11" font-family="system-ui, sans-serif">Logic &amp; data</text>
-<line x1="192" y1="64" x2="384" y2="64" stroke="#818cf8" stroke-width="1.5" marker-end="url(#ar)"/>
-<text x="290" y="55" text-anchor="middle" fill="#a1a1aa" font-size="11" font-weight="500" font-family="system-ui, sans-serif">Request</text>
-<line x1="388" y1="97" x2="196" y2="97" stroke="#4ade80" stroke-width="1.5" marker-end="url(#ag)"/>
-<text x="290" y="118" text-anchor="middle" fill="#a1a1aa" font-size="11" font-weight="500" font-family="system-ui, sans-serif">Response</text>
-</svg>
-</div>
-<p>The two talk to each other constantly. You click "Submit" (frontend), and a request flies to the server (backend), which processes it and sends back a response, which the frontend then displays. This back-and-forth happens dozens or hundreds of times in a single session. When an app feels slow, the bottleneck could be on either side — or in the network connection between them.</p>
-<p>Some apps are <strong>frontend-only</strong> — they run entirely in your browser with no server involved. A calculator app, a simple game, or a static website might work this way. Other apps are <strong>full-stack</strong> — they have significant logic on both sides. Any app with user accounts, saved data, or real-time collaboration is almost certainly full-stack.</p>
-<p>Why does this matter to you? Because when someone says "the backend is down," they mean the server isn't responding — your browser is fine, but it can't get the data it needs. When someone says "it's a frontend bug," they mean the display or interaction is broken, but the underlying data might be perfectly fine. Knowing which side of the boundary the problem lives on is half the battle of any technical conversation.</p>
-<div class="callout tip"><strong>Key principle:</strong> Frontend is what users experience. Backend is what makes the experience real. Most interesting software involves both, talking to each other constantly.</div>`
-      },
-      {
-        title: "What web apps are and why they matter",
-        body: `<p>A web app is software delivered through a browser. Instead of downloading and installing a program on your computer, you open Chrome or Safari and go to a URL. The app loads and runs right there.</p>
-<p>This sounds simple, but it was a revolution. Before web apps, software had to be individually installed on every computer that used it. Updates meant shipping CDs or downloading patches. Web apps eliminated all of that. You build it once, host it somewhere, and anyone with a browser and internet can use it instantly.</p>
-<p>Today, a staggering amount of the world's software runs this way. Google Docs, Slack, Figma, Salesforce, your bank's online portal, ChatGPT, Netflix, Spotify's web player — all web apps. Even many "desktop apps" are secretly web apps in disguise. Slack's desktop app, for example, is essentially a browser window packaged as a standalone application using a technology called Electron.</p>
-<p>Web apps range enormously in complexity. A simple web app might be a static landing page with some interactive elements. A complex web app might be a full-featured design tool like Figma that rivals software that previously required a powerful desktop application. The line between "website" and "web app" is blurry, but generally: if you're mostly reading, it's a website; if you're mostly <em>doing</em> things, it's a web app.</p>
-<p>For your career, this matters because web apps are the dominant delivery mechanism for modern business tools. When someone says "I built an app," they usually mean a web app. When a startup launches a product, it's almost always a web app first. Understanding how they work puts you inside the conversation about how most modern software actually gets made and delivered.</p>
-<div class="callout tip"><strong>Key principle:</strong> Web apps are not lesser software. They are how much of the modern economy runs. If you can build or direct the building of web apps, you can create real tools.</div>`
-      },
-      {
-        title: "HTML, CSS, and JavaScript in plain English",
-        body: `<p>Every web app is ultimately built from three foundational technologies. You don't need to write them, but you should know what they are and what they do, because every technical conversation about web development references them.</p>
-<p><strong>HTML</strong> (HyperText Markup Language) is the skeleton. It defines the structure and content of a page. Headings, paragraphs, buttons, images, links, forms, tables, lists — all of these are defined in HTML. Think of HTML as the architect's blueprint that says "there's a heading here, a paragraph there, a button below that, and an image to the right." HTML doesn't care about what anything looks like — it only cares about what things <em>are</em>.</p>
-<p><strong>CSS</strong> (Cascading Style Sheets) is the skin and clothing. It controls everything visual: colors, fonts, spacing, sizes, positions, borders, shadows, animations, and responsive behavior (how things rearrange on different screen sizes). The same HTML can look completely different depending on the CSS applied to it. This is why websites can have "dark mode" — the HTML stays the same, but the CSS swaps out the color values.</p>
-<p><strong>JavaScript</strong> is the nervous system and muscles. It handles behavior — what happens when you click, type, scroll, hover, or wait. JavaScript makes things interactive. A dropdown menu that opens on click, a form that validates your email before you submit, a chart that updates in real time — all JavaScript. Without JavaScript, web pages would be static documents. With it, they become applications.</p>
-<p>In the real world, developers rarely write raw HTML, CSS, and JavaScript from scratch for large projects. They use <strong>frameworks</strong> — structured toolkits that organize these three technologies into manageable patterns. React, Vue, and Angular are popular frontend frameworks. They don't replace HTML, CSS, and JavaScript — they organize them. When someone says "we use React," they mean they use a specific organized way of writing JavaScript that handles user interfaces efficiently.</p>
-<div class="callout tip"><strong>Key principle:</strong> HTML is structure, CSS is appearance, JavaScript is behavior. Frameworks organize these three into manageable systems. You don't need to write any of them — but knowing what they are lets you understand what people are talking about when they discuss building web applications.</div>`
-      }
-    ]
+// ─── MODULE 1 ───
+{
+  id: 1, title: "What Software Actually Is", time: "15 min",
+  lessons: [
+    { id: "1.1", title: "Software is state + logic + interface", body: `
+<p>Every piece of software does three things: it <strong>remembers things</strong> (state), <strong>makes decisions</strong> (logic), and <strong>shows you something</strong> (interface). That's the whole game. Every app you've ever used — from a banking app to a video game to a spreadsheet — is doing some combination of those three things, over and over, very fast.</p>
+<p><strong>State</strong> is what the software knows right now. Your shopping cart has 3 items in it. You're logged in. The document has 4 pages. A game character has 75 health points. State is the current snapshot of all the data the software is tracking. When you close an app and reopen it, the state that was saved to a database comes back. The state that wasn't saved is gone.</p>
+<p><strong>Logic</strong> is the rules. If the cart total exceeds $50, apply free shipping. If the password is wrong three times, lock the account. If the character's health hits 0, game over. Logic is every if/then/else decision the software makes, millions of times per second. The complexity of software comes almost entirely from the sheer number of these rules and how they interact with each other.</p>
+<p><strong>Interface</strong> is what you see and touch. Buttons, text fields, charts, notifications, error messages. The interface translates state into something visual and translates your actions back into changes to the state. You click "Add to Cart" (interface) → the cart gains an item (state change) → the cart icon updates to show "4" (interface reflects new state).</p>
+<div class="callout">
+<strong>Key principle:</strong> Every software feature you've ever used, requested, or complained about is ultimately about state (what data?), logic (what rules?), or interface (what does the user see/do?). When you describe a feature request in these terms, engineers immediately understand what you need.
+</div>` },
+    { id: "1.2", title: "Frontend vs backend", body: `
+<p>The <strong>frontend</strong> is everything that runs on your device — the web page in your browser, the app on your phone. It's what you see, tap, scroll, and interact with. The frontend is responsible for layout, animations, form fields, buttons, and making everything look and feel right.</p>
+<p>The <strong>backend</strong> is everything that runs on a server somewhere else. It handles the heavy lifting: storing data in databases, processing business logic, authenticating users, sending emails, talking to other services. When you log in, the frontend sends your credentials to the backend, the backend checks them against the database, and if they match, it sends back a "yes, you're in" along with your account data.</p>
+<p>They communicate through <strong>APIs</strong> (Application Programming Interfaces) — structured messages sent over the internet. The frontend says "give me this user's order history," the backend queries the database and sends back the data, and the frontend displays it. This separation means the frontend and backend can be built by different teams, using different programming languages, and can change independently — as long as they agree on the API contract between them.</p>
+<p>This is why you'll sometimes hear "it's a frontend issue" or "it's a backend issue." If a button doesn't look right, that's frontend. If clicking that button returns the wrong data, that's backend. If clicking that button does nothing, it could be either — maybe the frontend isn't sending the request correctly, or maybe the backend isn't responding.</p>
+<div class="callout">
+<strong>Key principle:</strong> Frontend = what you see. Backend = what you don't see. API = how they talk. This separation is fundamental to how all modern software is built.
+</div>` },
+    { id: "1.3", title: "What web apps actually are", body: `
+<p>A <strong>web application</strong> is software that runs in your browser. Gmail, Figma, Notion, Google Docs, Slack's web version — these are all web apps. They look and feel like "real" programs, but they're built with web technologies and delivered through a URL.</p>
+<p>When you visit a web app, your browser downloads HTML (the structure), CSS (the styling), and JavaScript (the behavior). JavaScript is doing the heavy lifting — it's a full programming language running inside your browser, capable of building complex, interactive interfaces. Modern web apps use JavaScript frameworks like React, Vue, or Angular to manage complex interfaces with many moving parts.</p>
+<p>A <strong>native app</strong> is software built specifically for one platform — an iOS app written in Swift, an Android app written in Kotlin, a Windows app written in C#. Native apps can access device features more deeply (camera, GPS, push notifications) and often feel faster and smoother. The trade-off is that you have to build and maintain separate versions for each platform.</p>
+<p><strong>Hybrid apps</strong> split the difference. They're web apps wrapped in a native container, so they can be distributed through app stores and access some device features. Many apps you think are "native" are actually hybrid — built with web technologies but packaged to look like native apps.</p>
+<div class="callout">
+<strong>Key principle:</strong> Most modern software you interact with daily is a web app. The browser has become the operating system for most business software. When someone says "we're building a web app," they mean software delivered through the browser, built with HTML/CSS/JavaScript.
+</div>` },
+    { id: "1.4", title: "HTML, CSS, and JavaScript in plain English", body: `
+<p>Every web page you've ever visited is built with three technologies. They always work together, and understanding their roles takes about two minutes.</p>
+<p><strong>HTML</strong> (HyperText Markup Language) is the skeleton. It defines what's on the page: headings, paragraphs, images, buttons, links, forms, tables. HTML is purely structural — it says "there's a heading here, a paragraph there, a button below that." It doesn't say anything about what those things look like or what happens when you interact with them. If you stripped a web page down to just its HTML, you'd see plain text and images in a single column — ugly but functional.</p>
+<p><strong>CSS</strong> (Cascading Style Sheets) is the skin and clothing. It controls how things look: colors, fonts, sizes, spacing, layout, animations, backgrounds. CSS takes the raw HTML skeleton and makes it look like something. A blue button, a two-column layout, rounded corners, a shadow under a card, text that's 16px and dark grey — all CSS. This is why websites can have "dark mode" — the HTML stays the same, but the CSS swaps out the color values. When someone says "it's a styling issue," they usually mean CSS.</p>
+<p><strong>JavaScript</strong> is the nervous system and muscles. It handles behavior — what happens when you click, type, scroll, hover, or wait. JavaScript makes things interactive. A dropdown menu that opens on click, a form that validates your email before you submit, a chart that updates in real time, a chat interface that sends and receives messages — all JavaScript. Without JavaScript, web pages would be static documents. With it, they become applications.</p>
+<div class="callout tip">
+<strong>Quick test:</strong> If something looks wrong (wrong color, bad spacing, text too small), it's probably CSS. If something doesn't work (button does nothing, page doesn't load data), it's probably JavaScript. If something is missing or in the wrong place structurally, it might be HTML. This simple diagnostic will serve you well.
+</div>` }
+  ],
+  scenario: {
+    situation: `You're in a meeting with a designer and a developer. The designer shows a mockup of a new dashboard. The developer says "the data is already available through the API — it's mostly a frontend build." The designer asks for some animations on the charts. The developer hesitates and says "that depends on the library we use."`,
+    prompt: "What's actually being discussed here?",
+    options: [
+      { text: "The backend needs to be rebuilt to support the new dashboard", id: "a" },
+      { text: "The data (backend) already exists; the work is in building the visual interface (frontend) with HTML/CSS/JS, and the animation complexity depends on which JavaScript framework or library they choose", id: "b", correct: true },
+      { text: "The designer is asking for something impossible", id: "c" },
+      { text: "They need to hire a specialist for animations", id: "d" }
+    ],
+    explanation: `The developer is saying the backend work is done — the API already provides the data. The remaining work is frontend: building the visual layout (HTML/CSS) and making it interactive (JavaScript). The hesitation about animations is because different JavaScript charting libraries have different animation capabilities. This is a classic frontend scoping conversation.`
   },
-  {
-    title: "How Software Gets Built",
-    lessons: [
+  quiz: {
+    questions: [
       {
-        title: "Git and GitHub — version control for humans",
-        body: `<p>Imagine writing a 200-page report with five other people, all editing the same document at the same time, with the ability to undo any change anyone made at any point in history, compare any two versions, and work on experimental revisions without affecting the main document. That's what Git does for software.</p>
-<p><strong>Git</strong> is a version control system. It tracks every change made to every file in a project, who made the change, when they made it, and what they said about why. Every saved checkpoint is called a <strong>commit</strong> — a snapshot of the entire project at that moment with a short message describing what changed.</p>
-<p><strong>GitHub</strong> is a platform built on top of Git. If Git is the engine, GitHub is the highway system. GitHub hosts repositories (projects) online, provides tools for collaboration, enables code review through pull requests, tracks issues and bugs, and — critically for your career — serves as a public portfolio. When someone says "check my GitHub," they're showing you their body of work, complete with history.</p>
-<div class="diagram">
-<svg viewBox="0 0 580 150" fill="none" xmlns="http://www.w3.org/2000/svg">
-<line x1="30" y1="95" x2="550" y2="95" stroke="#27272a" stroke-width="2.5"/>
-<text x="30" y="128" fill="#a1a1aa" font-size="12" font-weight="600" font-family="system-ui, sans-serif">main</text>
-<circle cx="70" cy="95" r="8" fill="#6366f1"/>
-<circle cx="150" cy="95" r="8" fill="#6366f1"/>
-<circle cx="390" cy="95" r="11" fill="#0c0c0e" stroke="#4ade80" stroke-width="2.5"/>
-<circle cx="390" cy="95" r="5" fill="#4ade80"/>
-<circle cx="490" cy="95" r="8" fill="#6366f1"/>
-<text x="70" y="78" text-anchor="middle" fill="#71717a" font-size="9" font-family="system-ui, sans-serif">v1</text>
-<text x="150" y="78" text-anchor="middle" fill="#71717a" font-size="9" font-family="system-ui, sans-serif">v2</text>
-<text x="490" y="78" text-anchor="middle" fill="#71717a" font-size="9" font-family="system-ui, sans-serif">v4</text>
-<path d="M150 95 Q180 50 215 50 L325 50 Q360 50 390 95" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="6 3" fill="none"/>
-<text x="270" y="30" text-anchor="middle" fill="#4ade80" font-size="11" font-weight="600" font-family="system-ui, sans-serif">feature branch</text>
-<circle cx="245" cy="50" r="6" fill="#22c55e"/>
-<circle cx="305" cy="50" r="6" fill="#22c55e"/>
-<text x="390" y="128" text-anchor="middle" fill="#4ade80" font-size="10" font-weight="500" font-family="system-ui, sans-serif">merge</text>
-<text x="528" y="128" fill="#3f3f46" font-size="10" font-family="system-ui, sans-serif">time &rarr;</text>
-</svg>
-</div>
-<p>The key mental model is this: Git creates a <strong>complete, navigable history</strong> of a project. You can go back to any point in time. You can see exactly what changed between any two versions. You can trace any line of code back to the specific commit that introduced it. For a team building complex software, this isn't a luxury — it's oxygen.</p>
-<p>For you personally, GitHub matters for a different reason: it's where the market looks to see if you've actually built things. A clean GitHub profile with well-documented repositories signals that you can ship, not just talk. Whether or not you write code yourself, having projects on GitHub — with clear README files explaining what they are and why they matter — is one of the strongest public proof points available to a builder.</p>
-<div class="callout tip"><strong>Key principle:</strong> Git tracks change. GitHub makes change collaborative, reviewable, and public. Together, they're the memory system of modern software development.</div>`
+        q: "A user reports that the app shows the wrong account balance. Where does the investigation most likely start?",
+        options: [
+          "The CSS styling of the balance display",
+          "The backend logic or database where the balance is calculated and stored",
+          "The user's browser settings",
+          "The frontend animation code"
+        ],
+        correct: 1,
+        explanation: "A wrong balance is a data/logic issue, not a display issue. The investigation starts at the backend — the database (state) and the calculation logic. If the correct number is in the database but shows wrong on screen, then it's a frontend issue, but you start with the source of truth."
       },
       {
-        title: "Branches, commits, and pull requests",
-        body: `<p>These three concepts form the daily rhythm of software work. Understanding them transforms your ability to follow what a development team is actually doing.</p>
-<p>A <strong>branch</strong> is a parallel line of work. Imagine you're writing a novel and you want to try rewriting chapter 7 in a completely different way, but you don't want to lose the original version. In Git, you'd create a branch — a copy of the project where you can experiment freely. If the experiment works, you merge it back into the main story. If it doesn't, you delete the branch and nothing was harmed. Branches typically have descriptive names like <code>feature/cost-explorer</code> or <code>fix/login-bug</code>.</p>
-<p>The <strong>main branch</strong> (historically called "master," now often called "main") is the stable version — the source of truth. Nobody should be making risky changes directly on main. Instead, they create branches, do their work there, test it, get it reviewed, and only then merge it back.</p>
-<p>A <strong>commit</strong> is a saved checkpoint within a branch. As you work, you periodically save your progress with a commit. Each commit represents a meaningful unit of change — not every keystroke, but every logical step. "Add sidebar navigation" might be one commit. "Fix sidebar collapse on mobile" might be the next. The chain of commits tells the story of how a feature was built, step by step.</p>
-<p>A <strong>pull request</strong> (PR) is a formal proposal to merge one branch into another — usually to merge your feature branch into main. But a PR isn't just a merge button. It's a conversation. Other team members can review the changes, leave comments, ask questions, suggest improvements, and request modifications. This review process is where a huge amount of quality control happens.</p>
-<div class="callout tip"><strong>Key principle:</strong> Branches isolate work. Commits save progress with meaning. Pull requests are where trust gets negotiated before changes go live.</div>`
-      },
-      {
-        title: "Local vs deployed",
-        body: `<p>This distinction trips up more nontechnical people than almost anything else, and it's the source of one of the most common frustrations in software work.</p>
-<p><strong>Local</strong> means running on your own computer. When a developer is building or testing something, they're usually running it locally — on their laptop, in their own browser, with their own test data. It's fast to iterate, easy to experiment, and safe to break things. Nothing the developer does locally affects anyone else.</p>
-<p><strong>Deployed</strong> means running on a server that other people can access. This is the "live" version — the one real users interact with. A deployed application lives on infrastructure somewhere (often cloud services like AWS, or simpler platforms like GitHub Pages, Vercel, or Netlify) and is accessible via a URL.</p>
-<p>The gap between local and deployed is where enormous amounts of engineering pain live. Something can work perfectly on a developer's laptop and completely fail when deployed. Why? Because the environments are different. The developer's machine has specific settings, specific software versions, specific test data, and no load. The deployed environment has different settings, different constraints, real data, potentially thousands of simultaneous users, and security requirements that don't exist locally.</p>
-<div class="callout">Common things that work locally but break in deployment include: file paths specific to one computer, environment variables that aren't configured on the server, features that depend on a database connection the server can't reach, performance issues that only appear under real load, and security configurations that block certain requests. This is why <em>"it works on my machine"</em> has become the most mocked phrase in software engineering — because it's both true and irrelevant.</div>
-<p>The typical flow from local to deployed is: edit code locally, test locally, commit the changes to Git, push to GitHub, then deploy through some process (which might be automatic or manual). Each step is a chance for something to go wrong.</p>
-<div class="callout tip"><strong>Key principle:</strong> Local is your workshop. Deployed is the real world. The gap between them is where most engineering surprises live. "It works on my machine" is never the end of the conversation.</div>`
-      },
-      {
-        title: "Why estimates are always wrong",
-        body: `<p>If there's one universal truth in software development that nontechnical leaders need to internalize, it's this: software estimates are almost always wrong, and it's not because developers are lazy or incompetent. It's because software estimation is genuinely one of the hardest prediction problems in professional work.</p>
-<p>Here's why. A feature request often sounds simple: "Add an export button." Three words. But underneath those three words might be: What format should it export to? CSV? PDF? Excel? All three? What data should be included — everything visible, or everything in the database? Should it respect the user's current filters? What about permissions — can every user export, or only admins? What if the dataset is enormous — will it time out? Each of these questions reveals complexity that wasn't visible in the original request.</p>
-<p>This is called the <strong>iceberg problem</strong> — the visible request is a small fraction of the actual work. Unlike physical construction, where experienced builders can estimate fairly well because the materials and physics are well-understood, software is built from logic, and logic has an essentially unlimited number of edge cases.</p>
-<p>Good teams deal with this not by demanding better estimates, but by changing the approach. Instead of asking "how long will this take?" they ask "what's the smallest version we could build in one week?" Instead of committing to a precise date, they work in short cycles and adjust scope based on what they learn. They use terms like <em>"spike"</em> (a short investigation to reduce uncertainty) and <em>"MVP"</em> (the minimum viable version that proves whether the idea works).</p>
-<p>For you as a leader or collaborator, the key behavior is: <strong>never punish honest estimates, and never treat an estimate as a promise.</strong> When a developer says "two weeks, but it could be four," they're telling you the truth. The best response to an estimate is always: "What are the biggest unknowns that could change that number?"</p>
-<div class="callout tip"><strong>Key principle:</strong> Simple-sounding requests hide enormous complexity. Estimates are educated guesses, not commitments. The best leaders work with uncertainty instead of pretending it doesn't exist.</div>`
-      }
-    ]
-  },
-  {
-    title: "The Stuff That Makes It Hard",
-    lessons: [
-      {
-        title: "APIs — how systems talk to each other",
-        body: `<p>An API (Application Programming Interface) is one of the most important concepts in modern software, and it's simpler than it sounds. An API is a structured way for one piece of software to request something from another piece of software and get a response.</p>
-<p>Think of it like a restaurant. You (the client) don't walk into the kitchen and cook your own food. You look at the menu (the API documentation), place an order with the waiter (send a request), the kitchen prepares it (processes the request), and the waiter brings back your food (the response). You don't need to know how the kitchen works. You just need to know what's on the menu and how to order.</p>
-<div class="diagram">
-<svg viewBox="0 0 580 170" fill="none" xmlns="http://www.w3.org/2000/svg">
-<defs>
-<marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#818cf8"/></marker>
-<marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#4ade80"/></marker>
-</defs>
-<rect x="16" y="25" width="155" height="120" rx="10" fill="#18181b" stroke="#3f3f46" stroke-width="1.5"/>
-<text x="93" y="65" text-anchor="middle" fill="#e4e4e7" font-size="14" font-weight="600" font-family="system-ui, sans-serif">Your App</text>
-<text x="93" y="88" text-anchor="middle" fill="#71717a" font-size="10" font-family="system-ui, sans-serif">Needs data</text>
-<rect x="215" y="48" width="150" height="74" rx="8" fill="#16162a" stroke="#6366f1" stroke-width="1" stroke-dasharray="5 3"/>
-<text x="290" y="78" text-anchor="middle" fill="#818cf8" font-size="10" font-weight="700" font-family="system-ui, sans-serif" letter-spacing="0.08em">API CONTRACT</text>
-<text x="290" y="100" text-anchor="middle" fill="#71717a" font-size="10" font-family="system-ui, sans-serif">&quot;Send this, get that&quot;</text>
-<rect x="409" y="25" width="155" height="120" rx="10" fill="#18181b" stroke="#3f3f46" stroke-width="1.5"/>
-<text x="486" y="65" text-anchor="middle" fill="#e4e4e7" font-size="14" font-weight="600" font-family="system-ui, sans-serif">Weather API</text>
-<text x="486" y="88" text-anchor="middle" fill="#71717a" font-size="10" font-family="system-ui, sans-serif">Has data</text>
-<line x1="171" y1="72" x2="212" y2="72" stroke="#818cf8" stroke-width="1.5" marker-end="url(#a1)"/>
-<line x1="365" y1="72" x2="406" y2="72" stroke="#818cf8" stroke-width="1.5" marker-end="url(#a1)"/>
-<text x="290" y="40" text-anchor="middle" fill="#818cf8" font-size="10" font-family="monospace">GET /weather?city=SF</text>
-<line x1="409" y1="100" x2="368" y2="100" stroke="#4ade80" stroke-width="1.5" marker-end="url(#a2)"/>
-<line x1="215" y1="100" x2="174" y2="100" stroke="#4ade80" stroke-width="1.5" marker-end="url(#a2)"/>
-<text x="290" y="155" text-anchor="middle" fill="#4ade80" font-size="10" font-family="monospace">{ temp: 72, sky: &quot;clear&quot; }</text>
-</svg>
-</div>
-<p>APIs matter enormously because they're how the modern software ecosystem is connected. Very few applications exist in isolation. Most are orchestrations of multiple APIs — a payment API, an email API, a mapping API, an AI model API, a database API. Building a modern application is often less about writing every piece of logic from scratch and more about knowing which APIs to use and how to connect them effectively.</p>
-<p>The key thing APIs define is a <strong>contract</strong>: if you send this specific type of request in this specific format, you will get this specific type of response. When the contract is violated — the request is malformed, the API is down, the response format changes unexpectedly — things break. A significant portion of real-world software bugs are API integration issues.</p>
-<p>For you, the practical implication is this: when someone says "we need to integrate with their API," they mean they need to build the connection between your system and theirs according to a defined contract. When someone says "the API is down," they mean an external system your software depends on has stopped responding. When someone says "we're rate-limited," they mean the external system is throttling your requests because you're sending too many too fast.</p>
-<div class="callout tip"><strong>Key principle:</strong> APIs are contracts for communication between systems. Modern software is mostly orchestration of APIs. When things break between systems, it's usually an API problem.</div>`
-      },
-      {
-        title: "Databases and persistence",
-        body: `<p>When you close a browser tab and reopen it, some apps remember exactly where you left off — your settings, your data, your history. Others reset completely. The difference is <strong>persistence</strong> — whether the app stores data durably or only keeps it temporarily in memory.</p>
-<p>A <strong>database</strong> is an organized system for storing, retrieving, and managing persistent data. It's the memory of an application. User accounts, transaction histories, uploaded files, saved preferences, content, analytics — anything an application needs to remember across sessions lives in a database.</p>
-<p>There are many types of databases, but the two broadest categories are <strong>relational databases</strong> (like PostgreSQL, MySQL) which store data in structured tables with defined relationships between them, and <strong>document databases</strong> (like MongoDB or Firebase) which store data in more flexible, less rigidly structured formats. You don't need to know the technical differences deeply, but you should know that the choice exists and matters.</p>
-<p>What makes databases complicated in practice isn't usually the storage itself — it's everything around it. <strong>Data integrity</strong>: making sure the data stays consistent even when multiple users are reading and writing simultaneously. <strong>Migration</strong>: changing the database structure as the application evolves without losing existing data. <strong>Performance</strong>: making queries fast even when the database contains millions of records. <strong>Security</strong>: making sure only authorized users can access data they're supposed to.</p>
-<div class="callout">Many of the most frustrating software bugs are database-related. "The data is stale" (showing old information). "There's a race condition" (two users modified the same data simultaneously and something went wrong). "The migration failed" (an attempted structure change broke something). "The query is slow" (the database is taking too long to return results).</div>
-<p>For you, the key insight is this: adding persistence to any application dramatically increases its complexity. A demo or prototype that stores nothing is fundamentally simpler than a product that remembers things across sessions, users, and time. When someone estimates that adding "save" functionality will take much longer than you'd expect, this is usually why.</p>
-<div class="callout tip"><strong>Key principle:</strong> Databases are how applications remember. Persistence sounds simple but introduces enormous complexity around integrity, performance, security, and reliability.</div>`
-      },
-      {
-        title: "Permissions and edge cases",
-        body: `<p>If you've ever wondered why enterprise software feels so much clunkier than consumer apps, the answer is often two words: permissions and edge cases.</p>
-<p><strong>Permissions</strong> (also called authorization) control who can do what. In a simple app, everyone can do everything. In a business application, different users have different roles with different access levels. An admin can edit settings. A manager can approve requests. A viewer can only read. An auditor can see everything but change nothing. A contractor can access project A but not project B. Multiply this across dozens of roles, hundreds of features, and thousands of data objects, and you have a permission system that is genuinely complex to build, test, and maintain.</p>
-<p>Permissions aren't just about preventing bad behavior. They're about compliance, auditability, data protection, and legal requirements. In regulated industries (healthcare, finance, defense, government), permission systems must be demonstrably correct. You can't just <em>think</em> they work — you have to <em>prove</em> it.</p>
-<p><strong>Edge cases</strong> are the scenarios that fall outside the "happy path" — the normal, expected use of the software. What happens if a user submits a form with no data? What if they type 10,000 characters into a field meant for 100? What if they click "submit" twice rapidly? What if their internet drops mid-transaction? What if two people try to edit the same record simultaneously? What if a name contains an apostrophe and the system treats it as a code character?</p>
-<p>Each of these scenarios seems trivial in isolation. But multiply them across every feature, every user role, every data type, every device, every browser, every network condition — and you begin to understand why robust software takes so much longer to build than impressive demos. A demo handles the happy path beautifully. A product must handle everything else without crashing, losing data, or confusing the user.</p>
-<div class="callout tip"><strong>Key principle:</strong> Permissions create invisible complexity. Edge cases multiply the work far beyond the happy path. Most of what makes software robust is handling things that shouldn't happen but will.</div>`
-      },
-      {
-        title: "Technical debt and why \"just fix it\" isn't simple",
-        body: `<p>Every software system accumulates decisions over time — some good, some expedient, some regrettable. <strong>Technical debt</strong> is the accumulated cost of those expedient decisions: shortcuts taken, corners cut, temporary solutions that became permanent, structures that made sense once but no longer do.</p>
-<p>The metaphor of "debt" is deliberate. Just like financial debt, technical debt isn't inherently evil. Sometimes you borrow on purpose — you ship a quick version now, knowing you'll need to rebuild it properly later, because getting to market fast matters more than architectural elegance. That's strategic debt. The problem is when debt accumulates unconsciously, when nobody tracks it, and when the interest payments (slower development, more bugs, harder onboarding) start exceeding the original time saved.</p>
-<p>Common forms of technical debt include: <strong>duplicated code</strong> (the same logic copied in multiple places), <strong>hardcoded values</strong> (specific numbers embedded directly in the code instead of being configurable), <strong>missing tests</strong> (no automated way to verify that changes don't break existing functionality), <strong>poor documentation</strong> (the only person who understands how something works is the one who built it), <strong>outdated dependencies</strong> (old versions of libraries that no longer receive security updates), and <strong>tangled architecture</strong> (components so intertwined that changing one thing risks breaking many others).</p>
-<p>The reason "just fix it" is almost never simple is that technical debt is structural, not superficial. You can't fix duplicated code without first understanding everywhere it's duplicated. You can't update an outdated dependency without testing that every feature still works with the new version. You can't restructure tangled architecture without a plan for how the new structure should work and a way to migrate incrementally without breaking the live product.</p>
-<p>For you as a leader or collaborator, the right mental model is: <strong>technical debt is a management problem, not just a coding problem.</strong> The questions to ask are: "How much debt do we have?" "Where is it concentrated?" "What's the cost of not addressing it?" and "What's our plan for managing it?"</p>
-<div class="callout tip"><strong>Key principle:</strong> Technical debt is the accumulated cost of past shortcuts. It's not necessarily bad — but unmanaged debt slows everything down. Good teams manage it deliberately rather than ignoring it until it becomes a crisis.</div>`
-      }
-    ]
-  },
-  {
-    title: "AI Products Are Still Software",
-    lessons: [
-      {
-        title: "AI is workflows around probabilistic models",
-        body: `<p>The most important thing to understand about AI products — the thing that separates informed participants from confused observers — is that <strong>AI products are still software.</strong> They have frontends, backends, databases, APIs, permissions, edge cases, and technical debt, just like any other software. What makes them different is that somewhere inside the system, a probabilistic model is making decisions that aren't fully deterministic.</p>
-<div class="diagram">
-<svg viewBox="0 0 580 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-<defs>
-<marker id="aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3f3f46"/></marker>
-</defs>
-<rect x="4" y="20" width="88" height="60" rx="8" fill="#18181b" stroke="#3f3f46" stroke-width="1.5"/>
-<text x="48" y="46" text-anchor="middle" fill="#a1a1aa" font-size="9" font-weight="600" font-family="system-ui, sans-serif" letter-spacing="0.05em">USER</text>
-<text x="48" y="63" text-anchor="middle" fill="#e4e4e7" font-size="12" font-weight="500" font-family="system-ui, sans-serif">Input</text>
-<line x1="92" y1="50" x2="120" y2="50" stroke="#3f3f46" stroke-width="1.5" marker-end="url(#aw)"/>
-<rect x="123" y="20" width="100" height="60" rx="8" fill="#16162a" stroke="#6366f1" stroke-width="1.5"/>
-<text x="173" y="44" text-anchor="middle" fill="#818cf8" font-size="9" font-weight="600" font-family="system-ui, sans-serif" letter-spacing="0.05em">PROMPT</text>
-<text x="173" y="63" text-anchor="middle" fill="#e4e4e7" font-size="11" font-weight="500" font-family="system-ui, sans-serif">+ Context</text>
-<line x1="223" y1="50" x2="251" y2="50" stroke="#3f3f46" stroke-width="1.5" marker-end="url(#aw)"/>
-<rect x="254" y="14" width="112" height="72" rx="10" fill="#1a1a2e" stroke="#818cf8" stroke-width="2"/>
-<text x="310" y="44" text-anchor="middle" fill="#818cf8" font-size="9" font-weight="700" font-family="system-ui, sans-serif" letter-spacing="0.1em">AI MODEL</text>
-<text x="310" y="63" text-anchor="middle" fill="#71717a" font-size="10" font-family="system-ui, sans-serif">Probabilistic</text>
-<line x1="366" y1="50" x2="394" y2="50" stroke="#3f3f46" stroke-width="1.5" marker-end="url(#aw)"/>
-<rect x="397" y="20" width="88" height="60" rx="8" fill="#162a16" stroke="#22c55e" stroke-width="1.5"/>
-<text x="441" y="44" text-anchor="middle" fill="#4ade80" font-size="9" font-weight="600" font-family="system-ui, sans-serif" letter-spacing="0.05em">OUTPUT</text>
-<text x="441" y="63" text-anchor="middle" fill="#e4e4e7" font-size="11" font-weight="500" font-family="system-ui, sans-serif">+ Filtering</text>
-<line x1="485" y1="50" x2="513" y2="50" stroke="#3f3f46" stroke-width="1.5" marker-end="url(#aw)"/>
-<rect x="516" y="20" width="60" height="60" rx="8" fill="#18181b" stroke="#3f3f46" stroke-width="1.5"/>
-<text x="546" y="44" text-anchor="middle" fill="#a1a1aa" font-size="9" font-weight="600" font-family="system-ui, sans-serif" letter-spacing="0.05em">END</text>
-<text x="546" y="63" text-anchor="middle" fill="#e4e4e7" font-size="12" font-weight="500" font-family="system-ui, sans-serif">User</text>
-</svg>
-</div>
-<p>Traditional software is mostly <strong>deterministic</strong>: the same input produces the same output every time. 2 + 2 always equals 4. AI software is often <strong>probabilistic</strong>: the same input might produce slightly different outputs each time, and the outputs have varying degrees of reliability. Ask a language model the same question twice and you might get two different — both reasonable — answers.</p>
-<p>This changes everything about how you build, test, trust, and deploy AI systems. In traditional software, you can write tests that say "given this input, expect exactly this output." With AI, you often can't. Instead, you have to think about ranges of acceptable outputs, frequency of failures, severity of errors, and how to handle uncertainty gracefully.</p>
-<p>The practical result is that most useful AI products are not "just a model" — they're <strong>workflows built around models.</strong> The workflow handles everything the model can't: retrieving the right context, formatting the input, structuring the output, validating the result, handling errors, and deciding when human oversight is needed. A great AI product might use a mediocre model inside a brilliant workflow and outperform a product that uses the best model inside a sloppy workflow.</p>
-<p>This is why the phrase "just add AI" is so misleading. Adding a model to a system is like hiring a brilliant but unreliable employee — you need to build processes around them that amplify their strengths and contain their weaknesses.</p>
-<div class="callout tip"><strong>Key principle:</strong> AI products are software with a probabilistic engine inside. The model matters, but the workflow around the model often matters more. Building good AI products is system design, not just model selection.</div>`
-      },
-      {
-        title: "Prompting vs workflows vs agents",
-        body: `<p>These three terms represent three levels of sophistication in how people use AI models, and understanding the differences helps you evaluate what's real versus what's hype.</p>
-<p><strong>Prompting</strong> is the simplest level. You send instructions to a model and get output. "Summarize this document." "Write a marketing email." One input, one output. This is how most people interact with ChatGPT or Claude. Prompting is useful but limited — it depends entirely on the quality of the single instruction and whatever context you include. It's like having a one-shot conversation with a smart person who has no memory and no access to your systems.</p>
-<p><strong>Workflows</strong> are a structured sequence of steps built around the model. Instead of one prompt, you chain multiple operations together. For example: extract text from a PDF, classify each section by type, summarize the key findings, generate recommended actions, format into a report template. Each step is designed, tested, and optimized. Workflows are dramatically more powerful than single prompts because they decompose complex tasks into manageable pieces.</p>
-<p><strong>Agents</strong> are systems where the model can reason about what to do next, use tools, observe results, and continue iteratively toward a goal. An agent might: search a database, realize it needs more information, call an API, analyze the results, decide to search again with different parameters, synthesize findings, and produce a recommendation — all without being told each step in advance. Agents sound exciting, and they can be powerful, but they're also harder to control, debug, and trust.</p>
-<div class="diagram">
-<svg viewBox="0 0 580 270" fill="none" xmlns="http://www.w3.org/2000/svg">
-<defs>
-<marker id="ac" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3f3f46"/></marker>
-<marker id="ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#f59e0b"/></marker>
-</defs>
-<text x="97" y="20" text-anchor="middle" fill="#818cf8" font-size="11" font-weight="700" font-family="system-ui, sans-serif" letter-spacing="0.08em">PROMPT</text>
-<text x="97" y="36" text-anchor="middle" fill="#71717a" font-size="9" font-family="system-ui, sans-serif">Single exchange</text>
-<text x="290" y="20" text-anchor="middle" fill="#4ade80" font-size="11" font-weight="700" font-family="system-ui, sans-serif" letter-spacing="0.08em">WORKFLOW</text>
-<text x="290" y="36" text-anchor="middle" fill="#71717a" font-size="9" font-family="system-ui, sans-serif">Fixed pipeline</text>
-<text x="483" y="20" text-anchor="middle" fill="#f59e0b" font-size="11" font-weight="700" font-family="system-ui, sans-serif" letter-spacing="0.08em">AGENT</text>
-<text x="483" y="36" text-anchor="middle" fill="#71717a" font-size="9" font-family="system-ui, sans-serif">AI decides next step</text>
-<line x1="193" y1="8" x2="193" y2="262" stroke="#1e1e22" stroke-width="1"/>
-<line x1="387" y1="8" x2="387" y2="262" stroke="#1e1e22" stroke-width="1"/>
-<rect x="47" y="52" width="100" height="36" rx="6" fill="#18181b" stroke="#3f3f46" stroke-width="1"/>
-<text x="97" y="75" text-anchor="middle" fill="#e4e4e7" font-size="11" font-family="system-ui, sans-serif">Question</text>
-<line x1="97" y1="88" x2="97" y2="108" stroke="#3f3f46" stroke-width="1.5" marker-end="url(#ac)"/>
-<rect x="47" y="113" width="100" height="36" rx="6" fill="#16162a" stroke="#6366f1" stroke-width="1.5"/>
-<text x="97" y="136" text-anchor="middle" fill="#818cf8" font-size="11" font-weight="600" font-family="system-ui, sans-serif">Model</text>
-<line x1="97" y1="149" x2="97" y2="169" stroke="#3f3f46" stroke-width="1.5" marker-end="url(#ac)"/>
-<rect x="47" y="174" width="100" height="36" rx="6" fill="#18181b" stroke="#3f3f46" stroke-width="1"/>
-<text x="97" y="197" text-anchor="middle" fill="#e4e4e7" font-size="11" font-family="system-ui, sans-serif">Answer</text>
-<rect x="225" y="52" width="130" height="32" rx="6" fill="#18181b" stroke="#3f3f46" stroke-width="1"/>
-<text x="290" y="73" text-anchor="middle" fill="#e4e4e7" font-size="10" font-family="system-ui, sans-serif">1. Classify email</text>
-<line x1="290" y1="84" x2="290" y2="98" stroke="#3f3f46" stroke-width="1.5" marker-end="url(#ac)"/>
-<rect x="225" y="103" width="130" height="32" rx="6" fill="#18181b" stroke="#3f3f46" stroke-width="1"/>
-<text x="290" y="124" text-anchor="middle" fill="#e4e4e7" font-size="10" font-family="system-ui, sans-serif">2. Route to team</text>
-<line x1="290" y1="135" x2="290" y2="149" stroke="#3f3f46" stroke-width="1.5" marker-end="url(#ac)"/>
-<rect x="225" y="154" width="130" height="32" rx="6" fill="#18181b" stroke="#3f3f46" stroke-width="1"/>
-<text x="290" y="175" text-anchor="middle" fill="#e4e4e7" font-size="10" font-family="system-ui, sans-serif">3. Draft response</text>
-<line x1="290" y1="186" x2="290" y2="200" stroke="#3f3f46" stroke-width="1.5" marker-end="url(#ac)"/>
-<rect x="225" y="205" width="130" height="32" rx="6" fill="#162a16" stroke="#22c55e" stroke-width="1"/>
-<text x="290" y="226" text-anchor="middle" fill="#4ade80" font-size="10" font-family="system-ui, sans-serif">4. Check tone</text>
-<rect x="430" y="52" width="106" height="32" rx="6" fill="#18181b" stroke="#3f3f46" stroke-width="1"/>
-<text x="483" y="73" text-anchor="middle" fill="#e4e4e7" font-size="10" font-family="system-ui, sans-serif">Goal</text>
-<line x1="483" y1="84" x2="483" y2="98" stroke="#3f3f46" stroke-width="1.5" marker-end="url(#ac)"/>
-<rect x="430" y="103" width="106" height="32" rx="6" fill="#2a2416" stroke="#f59e0b" stroke-width="1.5"/>
-<text x="483" y="124" text-anchor="middle" fill="#f59e0b" font-size="10" font-weight="600" font-family="system-ui, sans-serif">Plan</text>
-<line x1="483" y1="135" x2="483" y2="149" stroke="#3f3f46" stroke-width="1.5" marker-end="url(#ac)"/>
-<rect x="430" y="154" width="106" height="32" rx="6" fill="#2a2416" stroke="#f59e0b" stroke-width="1.5"/>
-<text x="483" y="175" text-anchor="middle" fill="#f59e0b" font-size="10" font-weight="600" font-family="system-ui, sans-serif">Act</text>
-<line x1="483" y1="186" x2="483" y2="200" stroke="#3f3f46" stroke-width="1.5" marker-end="url(#ac)"/>
-<rect x="430" y="205" width="106" height="32" rx="6" fill="#2a2416" stroke="#f59e0b" stroke-width="1.5"/>
-<text x="483" y="226" text-anchor="middle" fill="#f59e0b" font-size="10" font-weight="600" font-family="system-ui, sans-serif">Observe</text>
-<path d="M536 221 C558 221 560 119 536 119" stroke="#f59e0b" stroke-width="1.5" fill="none" stroke-dasharray="4 2" marker-end="url(#ao)"/>
-</svg>
-</div>
-<p>The practical wisdom here is: <strong>start with prompts, graduate to workflows, and use agents only when the task genuinely requires autonomous multi-step reasoning.</strong> Many impressive AI products are actually well-designed workflows, not agents. The hype cycle pushes people toward agents, but workflows are where most current business value lives.</p>
-<p>When evaluating AI tools or proposals, ask: "Is this a single prompt, a workflow, or an agent? And does the complexity of the approach match the complexity of the problem?" If someone proposes an agent architecture for a task that could be solved with a three-step workflow, that's a red flag for over-engineering.</p>
-<div class="callout tip"><strong>Key principle:</strong> Prompts are one-shot. Workflows are structured multi-step systems. Agents are autonomous reasoners. Most real business value today comes from well-designed workflows, not agents. Match the complexity of the approach to the complexity of the problem.</div>`
-      },
-      {
-        title: "Retrieval, structured output, and tools",
-        body: `<p>Three capabilities transform AI from a party trick into a useful system. Understanding these three will help you evaluate whether an AI product is toy-grade or production-grade.</p>
-<p><strong>Retrieval</strong> means getting relevant external information and feeding it into the model's context. A language model only knows what was in its training data plus what you give it in the current conversation. Retrieval bridges that gap. When you ask an AI system about your company's Q3 results, it doesn't know them from training — it needs to retrieve that data from your documents, databases, or files and include it in the prompt. This is often called <em>RAG</em> (Retrieval-Augmented Generation). Without retrieval, AI systems are limited to their training knowledge, which may be outdated, incomplete, or irrelevant to your specific context.</p>
-<p><strong>Structured output</strong> means getting the model to respond in a defined, parseable format rather than free-form text. Instead of a model writing a paragraph about a customer's risk level, a structured output might return: <code>{risk_level: "high", confidence: 0.87, factors: ["late payments"]}</code>. This matters enormously because structured output can be validated, stored in databases, passed to other systems, and displayed consistently. Free-form text is hard to use programmatically. Structured output makes AI interoperable with the rest of your software stack.</p>
-<p><strong>Tools</strong> are external capabilities that a model can invoke during its reasoning. Instead of trying to do math in its head (which models are bad at), a model with a calculator tool can call the calculator. Instead of guessing about current stock prices, a model with a web search tool can look them up. Instead of imagining what your database contains, a model with a database tool can query it directly. Tools are what turn a model from a brain-in-a-jar into a brain with hands.</p>
-<p>These three capabilities together — retrieval, structured output, and tools — are what separate a chatbot from a useful AI system. When evaluating an AI product, ask: "Where does it get its information? Can it use external tools? Is the output structured and reliable?" If the answer to all three is "no," you're looking at a glorified chatbot.</p>
-<div class="callout tip"><strong>Key principle:</strong> Retrieval grounds AI in real data. Structured output makes AI usable by systems. Tools give AI access to reality. All three are necessary for production-grade AI products.</div>`
-      },
-      {
-        title: "Why demos lie and products are hard",
-        body: `<p>This lesson might be the most practically important in the entire course. If you remember only one thing about AI products, let it be this: <strong>the gap between an impressive demo and a reliable product is enormous, and it's where most AI initiatives die.</strong></p>
-<p>A demo is designed to show what's possible. It uses curated inputs, ideal conditions, and cherry-picked examples. The presenter knows exactly which questions to ask and which scenarios to demonstrate. When the demo works beautifully, everyone in the room thinks: "We should build this." What they don't see is what happens with bad inputs, ambiguous requests, adversarial users, edge cases, scale, or real-world data that's messier than the demo data.</p>
-<p>The journey from demo to product typically requires solving problems in at least six categories. <strong>Reliability</strong>: the system needs to work correctly not 70% of the time (enough for a demo) but 95-99% of the time (minimum for a product people will trust). <strong>Edge cases</strong>: what happens when the input is garbage or the model hallucinates? <strong>Scale</strong>: can it handle thousands of users simultaneously without becoming slow or expensive? <strong>Cost</strong>: every model call costs money — is the per-user cost sustainable? <strong>Integration</strong>: does it work with existing systems and workflows? <strong>Trust</strong>: will users believe the outputs enough to act on them?</p>
-<p>Hallucination is a particularly insidious problem. AI models can generate confident, fluent, detailed — and completely fabricated — information. In a demo, this rarely happens because the inputs are controlled. In production, it happens regularly. A product that sometimes makes up data is worse than a product that has no AI at all, because users may act on false information without realizing it.</p>
-<div class="callout"><strong>Always ask what happens in the unhappy path.</strong> What happens when the model is wrong? What happens when the input is ambiguous? What happens when the data source is unavailable? The answers to these questions — not the demo — determine whether the product will actually work.</div>
-<div class="callout tip"><strong>Key principle:</strong> Demos show possibility. Products prove reliability. The gap between them is where most AI projects fail. Always ask what happens when things go wrong, not just what happens when things go right.</div>`
-      }
-    ]
-  },
-  {
-    title: "How to Talk to Technical People",
-    lessons: [
-      {
-        title: "Good questions vs bad questions",
-        body: `<p>The fastest way to earn or lose credibility with technical people is through the questions you ask. Good questions signal that you think structurally and respect the complexity of the work. Bad questions signal that you don't understand what you're asking for.</p>
-<p><strong>Good questions</strong> tend to be structural and boundary-aware. They show that you're trying to understand the real nature of the problem, not just demanding a result. Examples: "What layer is this problem in — is it data, logic, or display?" "What's the narrowest version of this we could ship to test the idea?" "What hidden complexity makes this harder than it sounds?" "What breaks if we don't do this?" "What are the two or three biggest unknowns?"</p>
-<p><strong>Bad questions</strong> tend to be either naively reductive or vaguely expansive. "Can't we just add AI to it?" trivializes what might be weeks of integration work. "How hard can it be?" dismisses complexity the questioner doesn't understand. "Why can't we just do it the simple way?" assumes the complicated way was chosen arbitrarily. "When will it be done?" with no interest in scope, uncertainty, or tradeoffs treats estimation as a commitment rather than a prediction.</p>
-<p>The deeper principle is that good technical questions are <strong>investigative, not interrogative</strong>. You're trying to understand the real shape of the problem, not cross-examine the team. The best nontechnical leaders ask questions that make developers think "oh, that's a really good point" rather than "this person has no idea what they're asking for."</p>
-<p>A particularly powerful question format is: <em>"What would you do if you were making this decision?"</em> Engineers are often more capable of strategic thinking than they're given credit for. Asking for their judgment — and genuinely listening — builds trust and often surfaces options that a top-down directive would miss.</p>
-<div class="callout tip"><strong>Key principle:</strong> Good technical questions investigate constraints and tradeoffs. Bad ones dismiss complexity or demand simple answers to complex problems. The questions you ask reveal more about your competence than the statements you make.</div>`
-      },
-      {
-        title: "Signals that build credibility",
-        body: `<p>Technical people calibrate their trust in nontechnical colleagues quickly, often within the first few interactions. Certain behaviors signal that you're worth collaborating with, even if you can't write a line of code.</p>
-<p><strong>Accurate scoping language</strong> signals that you understand what you're asking for. Instead of "can we add a dashboard?" try "can we build a simple view that shows the three metrics that matter most, probably as a single page with filters?" The specificity shows you've thought about what you actually need. Developers strongly prefer working with people who can articulate clear, bounded requests.</p>
-<p><strong>Acknowledging tradeoffs</strong> signals maturity. "I know adding this feature means something else gets delayed — which tradeoff makes the most sense?" is a statement that builds instant credibility. It shows you understand that engineering time is finite and every priority has a cost.</p>
-<p><strong>Asking about failure modes</strong> signals sophistication. "What's most likely to go wrong with this approach?" or "Where does this break under stress?" are questions that technical people respect because they show you're thinking about real-world robustness, not just the happy path.</p>
-<p><strong>Following up on details you asked about</strong> signals genuine interest. If you asked how the deployment pipeline works last week and you reference it correctly this week, that registers. Technical people are used to nontechnical colleagues nodding politely and then forgetting everything. Demonstrating that you actually listened and retained information is a powerful trust-builder.</p>
-<p><strong>Being honest about what you don't know</strong> signals confidence and integrity. "I don't fully understand how the caching layer works — can you give me the 30-second version?" is far more respected than pretending you understand and then making decisions based on a misunderstanding. Honest ignorance combined with genuine curiosity is always preferable to performative knowledge.</p>
-<div class="callout tip"><strong>Key principle:</strong> Credibility with technical people comes from specificity, acknowledgment of tradeoffs, interest in failure modes, genuine follow-through, and honest admission of knowledge gaps. You don't need to be technical — you need to be real.</div>`
-      },
-      {
-        title: "Signals that destroy credibility",
-        body: `<p>Just as certain behaviors build trust with technical teams, others destroy it — sometimes permanently. The frustrating part is that many of these behaviors come from well-intentioned leaders who simply don't realize the damage they're causing.</p>
-<p><strong>"This should be easy"</strong> is probably the most damaging phrase a nontechnical person can utter about someone else's work. Even if you think it, don't say it. It dismisses complexity you likely don't understand and puts the developer in a position where they either agree (and set themselves up for failure) or disagree (and seem incompetent). If you think something should be simple, ask: <em>"Is this straightforward, or is there hidden complexity I'm not seeing?"</em> Same intent, completely different signal.</p>
-<p><strong>Changing requirements after work has started</strong> without acknowledging the cost is a trust-killer. It's fine for requirements to evolve — that's normal. What destroys credibility is acting like the change is trivial. "Oh, and can we also add X?" sounds like a small addition to you but might invalidate a week of architectural decisions. The credible version is: "I know this is a scope change — can you tell me what it would cost to add this?"</p>
-<p><strong>Treating estimates as promises</strong> drives engineers to either pad their estimates defensively or stop giving honest ones. When you say "you said two weeks and it's been three," you're treating an uncertain prediction as a contractual commitment. This trains people to never give you honest estimates again.</p>
-<p><strong>Using buzzwords without understanding</strong> — "let's just use AI," "make it an agent," "leverage machine learning" — signals that you're chasing trends rather than solving problems. Technical people can instantly tell when someone is parroting terms they read in an article versus using them with genuine understanding.</p>
-<p><strong>Taking credit for technical decisions you didn't make</strong> (or worse, blaming engineers for decisions you pushed on them) is career-defining behavior that technical teams remember forever. The reverse — publicly crediting the team and privately taking accountability for bad calls — builds loyalty that compounds for years.</p>
-<div class="callout tip"><strong>Key principle:</strong> Credibility is destroyed by dismissing complexity, changing scope carelessly, treating estimates as commitments, using jargon you don't understand, and misattributing decisions. Most of these are easily avoided once you're aware of them.</div>`
-      },
-      {
-        title: "Knowing when you're out of your depth",
-        body: `<p>This might be the most important skill in the entire course, because it's the skill that prevents all the others from becoming dangerous. Knowing enough to be useful is valuable. Knowing enough to be dangerous without realizing it is destructive. The difference is <strong>calibration</strong> — the ability to accurately sense where your understanding ends.</p>
-<p><strong>Warning signs that you're out of your depth:</strong> You understand the surface explanation but couldn't explain the mechanism to someone else. You're relying heavily on analogies rather than actual understanding. Multiple technical people are raising concerns you can't paraphrase back in your own words. You're arguing a position based on how things <em>should</em> work rather than how they actually work. You're making decisions about technical architecture based on business intuition alone.</p>
-<p><strong>What to do when you realize you're out of your depth:</strong> First, don't panic and don't retreat. The mature response is to name it: <em>"I think I'm at the edge of my understanding here. Can you help me see what I'm missing?"</em> This is not weakness. It's precisely the kind of statement that earns deep respect from technical people, because they know how rare honest self-assessment is.</p>
-<p>Second, <strong>stay decisive about goals while being humble about mechanisms.</strong> You can say "we need this feature to ship by the end of the quarter" (goal) without saying "and here's how I think you should build it" (mechanism). Leaders who clearly articulate <em>what</em> needs to happen and <em>why</em>, while genuinely deferring to technical experts on <em>how</em>, are the leaders that engineering teams love working for.</p>
-<p>Third, <strong>invest in learning the areas where you're consistently out of your depth.</strong> If every conversation about infrastructure makes you uncomfortable, spend two hours learning the basics. You don't need expertise — you need enough literacy to follow the conversation and ask good questions. That's what this course is about.</p>
-<p>The deepest version of this skill is understanding that being out of your depth is situational, not fixed. You might be highly fluent in product strategy but lost in database optimization. The people who grow the fastest are the ones who can accurately map their own knowledge boundaries and systematically expand them where it matters most.</p>
-<div class="callout tip"><strong>Key principle:</strong> The most dangerous person in a technical room is the one who doesn't know what they don't know. The most valuable nontechnical person is the one who can accurately sense their knowledge boundary and navigate it with honesty, curiosity, and clear goal-setting.</div>`
+        q: "What's the relationship between HTML, CSS, and JavaScript?",
+        options: [
+          "They're three different programming languages that do the same thing",
+          "HTML is structure, CSS is styling, JavaScript is behavior — they work together to create web pages",
+          "You only need JavaScript; HTML and CSS are outdated",
+          "HTML runs on the server, CSS and JavaScript run in the browser"
+        ],
+        correct: 1,
+        explanation: "HTML provides structure (what's on the page), CSS provides styling (how it looks), and JavaScript provides behavior (what happens when you interact). All three run in the browser and work together."
       }
     ]
   }
+},
+
+// ─── MODULE 2 ───
+{
+  id: 2, title: "How Software Gets Built", time: "15 min",
+  lessons: [
+    { id: "2.1", title: "Git and GitHub", body: `
+<p><strong>Git</strong> is a version control system — software that tracks every change to every file in a project. Think of it as an unlimited undo history for an entire codebase. Every time a developer makes a meaningful change, they create a <strong>commit</strong> — a snapshot of all the files at that moment, with a message describing what changed and why. The project's history is a chain of these commits, and you can go back to any point in that chain.</p>
+<p><strong>GitHub</strong> is a platform that hosts Git repositories (projects) online and adds collaboration features. It's where teams share code, review each other's work, track bugs, and coordinate development. Almost every software company uses GitHub (or similar platforms like GitLab or Bitbucket). When a developer says "check the repo," they mean look at the project on GitHub.</p>
+<p>The killer feature is <strong>branching</strong>. A branch is a parallel copy of the codebase where a developer can make changes without affecting the main version. You create a branch, build your feature, test it, and when it's ready, you <strong>merge</strong> it back into the main branch. If the feature doesn't work out, you delete the branch and the main codebase is untouched. This is how teams of developers can work on different features simultaneously without stepping on each other's toes.</p>
+<p>A <strong>pull request</strong> (PR) is a formal request to merge a branch into the main codebase. It shows exactly what changed, line by line, and other developers review it before approving. This code review process catches bugs, ensures quality, and spreads knowledge across the team. When someone says "I'll put up a PR," they mean they'll submit their changes for review.</p>
+<div class="callout">
+<strong>Key principle:</strong> Git gives developers a safety net and a collaboration system. Nothing goes live without being committed, reviewed, and merged. When someone says "it's in the PR," the feature is built but hasn't been reviewed and approved yet. When they say "it's merged," it's been approved and is part of the official codebase.
+</div>` },
+    { id: "2.2", title: "Environments: dev, staging, production", body: `
+<p>Software runs in different <strong>environments</strong> — separate copies of the system used for different purposes. Understanding this concept prevents a shocking number of miscommunications.</p>
+<p><strong>Development (dev)</strong> is the developer's local machine. This is where code gets written and tested initially. It's messy, things break constantly, and that's fine — it's a sandbox. When a developer says "it works on my machine," they mean it works in dev but might not work anywhere else.</p>
+<p><strong>Staging</strong> is a copy of the production system used for final testing before release. It has realistic data (often a copy of production data, scrubbed of sensitive information) and mirrors the production setup as closely as possible. When a PM says "can you test this in staging?" they mean verify the feature works in a production-like environment before real users see it.</p>
+<p><strong>Production (prod)</strong> is the live system that real users interact with. Production is sacred. Changes to production are carefully controlled because bugs in production affect real users, real revenue, and real reputation. When someone says "it's in production" or "it's live," they mean real users can see and use it right now.</p>
+<p>The typical flow: code is written in dev → pushed to GitHub → reviewed in a PR → merged → automatically deployed to staging → tested → promoted to production. This process is called the <strong>deployment pipeline</strong>, and it can be highly automated (code reaches production minutes after merging) or heavily gated (requiring manual approvals at each step).</p>
+<div class="callout">
+<strong>Key principle:</strong> The question "which environment?" resolves half of all "it's broken" conversations. Something working in staging but broken in production (or vice versa) tells you exactly where to investigate.
+</div>` },
+    { id: "2.3", title: "CI/CD and deployment", body: `
+<p><strong>CI/CD</strong> stands for Continuous Integration / Continuous Deployment. It's the automated pipeline that takes code from "a developer wrote it" to "users can see it."</p>
+<p><strong>Continuous Integration (CI)</strong> means that every time a developer pushes code, automated checks run: the code compiles, tests pass, code quality standards are met. If any check fails, the developer is notified immediately. This catches problems early — within minutes of the code being written — rather than days or weeks later when they're harder to fix and more expensive to debug.</p>
+<p><strong>Continuous Deployment (CD)</strong> means that code that passes all checks is automatically deployed to production. Not every team does full CD — many have a manual approval step between "all checks pass" and "goes to production." But the trend is toward more automation, because manual steps are slow, error-prone, and create bottlenecks.</p>
+<p>The alternative to CI/CD is "big bang" releases: accumulate weeks or months of changes, then deploy everything at once. This is risky because if something breaks, you have to figure out which of hundreds of changes caused the problem. CI/CD prefers small, frequent deployments — each one is less risky, easier to debug, and faster to roll back if something goes wrong.</p>
+<p>A <strong>rollback</strong> is reverting to the previous version of the software if the new deployment causes problems. Good deployment systems make rollbacks fast and easy — often a single button click. This is why "we can always roll back" is a reassuring phrase in deployment conversations.</p>
+<div class="callout">
+<strong>Key principle:</strong> CI/CD turns deployment from a stressful event into a routine process. Small, frequent, automated deployments are safer than big, rare, manual ones. If your team deploys often (multiple times per day), that's usually a sign of a mature engineering practice, not recklessness.
+</div>` },
+    { id: "2.4", title: "Testing: unit, integration, end-to-end", body: `
+<p>Testing is how teams verify that software works correctly — not just today, but after every future change. There are three main levels of testing, and understanding them helps you understand why "just test it" isn't as simple as it sounds.</p>
+<p><strong>Unit tests</strong> test individual functions in isolation. "Does this function correctly calculate sales tax?" A unit test gives it known inputs and checks that the output is correct. Unit tests are fast (thousands can run in seconds), cheap to write, and catch bugs at the smallest level. But they don't catch problems that only appear when components interact.</p>
+<p><strong>Integration tests</strong> test how components work together. "When the frontend sends a checkout request to the backend, does the backend correctly process the payment and update the order database?" Integration tests catch the bugs that live in the gaps between components — the miscommunications, the incorrect assumptions about data formats, the timing issues.</p>
+<p><strong>End-to-end (E2E) tests</strong> simulate a real user interacting with the complete system. "Open the browser, log in, add an item to the cart, checkout, and verify the confirmation email arrives." E2E tests catch the bugs that only appear in the full system — but they're slow, expensive to maintain, and fragile (they break when the UI changes even if the functionality is fine).</p>
+<p>The common wisdom is the <strong>testing pyramid</strong>: many unit tests at the base, fewer integration tests in the middle, and a small number of E2E tests at the top. When a developer says "we need more test coverage," they mean too much of the code isn't being tested automatically, which means changes are risky.</p>
+<div class="callout">
+<strong>Key principle:</strong> Automated tests are a safety net that lets teams move fast without breaking things. The question "is this tested?" is one of the most important questions you can ask about any feature or bug fix.
+</div>` }
+  ],
+  scenario: {
+    situation: `A developer says "I'll put up a PR this afternoon." The product manager asks "So it'll be live today?" The developer looks uncomfortable.`,
+    prompt: "What's the miscommunication here?",
+    options: [
+      { text: "The developer is being lazy and doesn't want to ship", id: "a" },
+      { text: 'A PR (pull request) is a request for code review — the code still needs to be reviewed, approved, merged, tested in staging, and deployed before it\'s "live." PR ≠ deployed.', id: "b", correct: true },
+      { text: "The PM should insist on faster deployment", id: "c" },
+      { text: "PRs always go live the same day", id: "d" }
+    ],
+    explanation: `This is one of the most common miscommunications in software teams. A PR means the code is written but needs review, approval, and then must go through the deployment pipeline (CI/CD → staging → production). Depending on the team's process, this could take hours or days. The developer isn't stalling — the process exists to catch bugs before they reach users.`
+  },
+  quiz: {
+    questions: [
+      {
+        q: "A colleague says 'the fix is merged but not deployed yet.' What does this mean?",
+        options: [
+          "The fix doesn't work",
+          "The code change has been reviewed and added to the official codebase, but hasn't been pushed to the live (production) system yet",
+          "The developer forgot to finish the fix",
+          "The fix is live and users can see it"
+        ],
+        correct: 1,
+        explanation: "A branch is a parallel copy. A PR (pull request) is a request for the team to review changes before they merge into the official codebase. Nothing goes live until it's reviewed and merged."
+      },
+      {
+        q: "Your developer estimated a feature would take 3 days. It's day 5 and they say they found unexpected complexity. The best response is:",
+        options: [
+          "Ask them to work overtime to meet the original estimate",
+          "Ask what they discovered and how it changes the scope",
+          "Assume they're padding the estimate",
+          "Assign it to a different developer"
+        ],
+        correct: 1,
+        explanation: "Discovering complexity mid-build is normal, not a failure. The productive response is understanding what changed and adjusting plans accordingly. The worst response is treating the original estimate as a commitment."
+      }
+    ]
+  }
+},
+
+// ─── MODULE 3 ───
+{
+  id: 3, title: "The Stuff That Makes It Hard", time: "15 min",
+  lessons: [
+    { id: "3.1", title: "APIs — how systems talk to each other", body: `
+<p>An <strong>API</strong> (Application Programming Interface) is a structured way for one piece of software to request something from another piece of software. That's it. It's a contract: "If you send me a request in this format, I'll send you a response in that format."</p>
+<p>When you check the weather on your phone, the weather app doesn't have a thermometer. It sends a request to a weather service's API: "What's the weather in San Diego?" The API responds with structured data: temperature, humidity, wind speed, forecast. The app then displays that data in a pretty interface. The API is the middleman between the app you see and the data it needs.</p>
+<p>APIs are everywhere. When you pay with a credit card online, the store's website talks to a payment API (Stripe, Square, etc.). When you sign in with Google on a third-party site, that site talks to Google's authentication API. When a company's internal tools pull sales data from Salesforce, that's Salesforce's API. Modern software is built by stitching together dozens of APIs, each handling a specific function.</p>
+<p>The most common type is a <strong>REST API</strong>, which uses standard web requests (the same technology your browser uses to load web pages). You send a request to a URL (called an <strong>endpoint</strong>) with specific parameters, and you get back data, usually in a format called JSON. JSON looks like this: <code>{"temperature": 72, "condition": "sunny"}</code>. It's human-readable and machine-parseable, which is why it became the lingua franca of the internet.</p>
+<p>When APIs break or change, the software that depends on them breaks too. This is why "breaking changes" to an API are a big deal — if Stripe changes how their payment API works, every company that uses Stripe has to update their code. API versioning, documentation, and deprecation policies exist to manage this dependency chain.</p>
+<div class="callout">
+<strong>Key principle:</strong> APIs are contracts between systems. Modern software is really a constellation of APIs working together. When someone says "we need to integrate with their API," they mean "we need to write code that talks to their system in the format they expect."
+</div>` },
+    { id: "3.2", title: "Databases and persistence", body: `
+<p>When you close an app and reopen it later, your data is still there. That's not magic — it's a <strong>database</strong>. A database is a structured system for storing, organizing, and retrieving data. It's where the state lives permanently.</p>
+<p>The most common type is a <strong>relational database</strong> (PostgreSQL, MySQL, SQL Server). Think of it as a collection of interconnected spreadsheets. Each table has rows and columns, and tables can reference each other. A "users" table has one row per user. An "orders" table has one row per order, with a column that references which user placed it. The language for talking to relational databases is called <strong>SQL</strong> (Structured Query Language) — it lets you ask questions like "show me all orders over $100 from the last 30 days" or "which users signed up but never made a purchase?"</p>
+<p><strong>NoSQL databases</strong> (MongoDB, DynamoDB, Redis) store data differently — as documents, key-value pairs, or graphs instead of rigid tables. They're more flexible and often faster for certain use cases, but they sacrifice some of the structure and querying power of relational databases. The choice between SQL and NoSQL is one of those architectural decisions that's easy to make and hard to change later.</p>
+<p>Every time you interact with an app — posting a comment, updating your profile, adding an item to your cart — the backend writes something to the database. Every time the app shows you information — your order history, your friend list, your dashboard — the backend reads from the database. The performance of these reads and writes is often the bottleneck that determines how fast the app feels.</p>
+<p>Database problems are some of the hardest issues in software. Data can become inconsistent (two records that should match but don't). Queries can be slow (scanning millions of rows to find one result). Migrations — changing the structure of a database that already has data in it — are like performing surgery on a patient who can't stop running. They're necessary but terrifying.</p>
+<div class="callout">
+<strong>Key principle:</strong> The database is the source of truth. When someone says "the data is wrong," the database is where the investigation starts. When someone says "the app is slow," the database is often where the bottleneck lives.
+</div>` },
+    { id: "3.3", title: "Permissions and edge cases", body: `
+<p>The real difficulty in software isn't building the happy path — it's handling everything that can go wrong. <strong>Edge cases</strong> are the unusual, unexpected, or extreme situations that users encounter. And they will encounter them, reliably, every time.</p>
+<p>Consider a simple form that asks for a name. What happens if someone enters a single character? A 500-character name? A name with an apostrophe (O'Brien)? A name with Unicode characters? An empty string? A name that's also valid HTML code (which could break your page)? Each of these is an edge case. Individually they're trivial. Collectively, they represent an enormous amount of the work in software development.</p>
+<p><strong>Permissions</strong> add another layer of complexity. Who can see what? Who can edit what? Can a manager view their team's data? Can they view other teams' data? What if someone is on two teams? What if they were on a team last month but aren't anymore — can they still see historical data? Every permission rule creates branching logic, and the interactions between rules create exponential complexity. A system with 10 permission rules might have hundreds of possible permission states.</p>
+<p>This is why "just add a feature" is almost never simple. The feature itself might take a day to build. But handling all the edge cases — what if the user isn't logged in, what if they don't have permission, what if the data doesn't exist, what if two people try to do the same thing at the same time, what if the network drops halfway through — can take a week. The visible feature is the tip of the iceberg. The invisible handling of everything that can go wrong is the mass below the waterline.</p>
+<div class="callout">
+<strong>Key principle:</strong> Most of the work in software is handling the cases that aren't the happy path. When a developer says "it's more complex than it looks," they're usually referring to the edge cases and permission logic that aren't visible in the feature description.
+</div>` },
+    { id: "3.4", title: "Technical debt and why 'just fix it' isn't simple", body: `
+<p><strong>Technical debt</strong> is the accumulated cost of shortcuts, workarounds, and quick fixes that were made to ship faster. Just like financial debt, it compounds over time. A shortcut that saved a week today might cost a month of rework next year.</p>
+<p>Technical debt isn't always bad. Sometimes the right business decision is to ship fast and clean up later. A startup racing to get their product to market before funding runs out should absolutely take on technical debt — if the company doesn't survive, clean code is worthless. The problem is when the "clean up later" never happens, and the debt accumulates until every change becomes agonizingly slow and risky.</p>
+<p>Common forms of technical debt include: code that nobody on the current team wrote or understands ("legacy code"), systems that rely on outdated libraries or frameworks, duplicated logic that exists in multiple places and has to be updated everywhere, hardcoded values that should be configurable, and missing tests that mean nobody can confidently change anything without breaking something else.</p>
+<p>When someone says "we need to refactor," they mean they need to restructure existing code without changing what it does — reorganizing the internals to make future changes easier. Refactoring doesn't produce visible new features, which makes it a hard sell in product meetings. But without it, the codebase gradually becomes a minefield where every new feature risks breaking three old ones.</p>
+<p>The phrase "just fix it" is the bane of every engineer's existence. In a system with significant technical debt, there is no "just." Fixing one thing touches five other things. Each of those touches creates potential breakage in systems you didn't even know were connected. The responsible answer is often "we can fix it, but we need to also fix these three related things or we'll create a worse problem," and that responsible answer sounds like an excuse to someone who doesn't understand the codebase.</p>
+<div class="callout">
+<strong>Key principle:</strong> Technical debt is real and it has real costs. When the engineering team says "we need to slow down and pay down debt," they're trying to protect the team's future velocity. Ignoring them is like ignoring credit card statements — it feels free until it doesn't.
+</div>` }
+  ],
+  scenario: {
+    situation: `You're in a product meeting. The PM wants to add a "share via link" feature to the dashboard. A developer says "that's at least two weeks." The PM says "it's just a link — how can it be two weeks?" The developer starts listing edge cases: permissions (who can see shared links?), expiration (do links expire?), analytics (do we track who clicks?), authentication (can non-users access shared content?), revocation (can you un-share something?).`,
+    prompt: "What's the best response?",
+    options: [
+      { text: "Side with the PM — it really should be simpler than two weeks", id: "a" },
+      { text: "Ask the developer which of those edge cases are must-haves for v1 and which can wait", id: "b", correct: true },
+      { text: "Tell the developer to just build the basic version without those concerns", id: "c" },
+      { text: "Table the discussion until you can get a more detailed estimate", id: "d" }
+    ],
+    explanation: `The developer is right that all those concerns are real. The PM is right that shipping something is better than shipping nothing. The productive move is scoping: which edge cases are critical for launch (probably permissions and authentication) and which can be v2 (analytics, expiration, revocation)? This is how experienced leaders navigate the tension between "ship fast" and "build it right."`
+  },
+  quiz: {
+    questions: [
+      {
+        q: `A developer says "we need to migrate the database." What does this mean?`,
+        options: [
+          "Move the database to a different server",
+          "Change the structure of the database (add/remove/modify tables or columns) while preserving existing data",
+          "Delete old data to make room for new data",
+          "Switch from one database vendor to another"
+        ],
+        correct: 1,
+        explanation: "Database migrations change the schema (structure) while keeping the data intact. It's delicate because the database is live and serving users while you're modifying it."
+      },
+      {
+        q: "What is technical debt?",
+        options: [
+          "The cost of servers and cloud infrastructure",
+          "Money owed to technology vendors",
+          "The accumulated cost of shortcuts and workarounds that make future changes harder",
+          "The budget allocated for fixing bugs"
+        ],
+        correct: 2,
+        explanation: "Technical debt is a metaphor for the compounding cost of expedient decisions. Like financial debt, it's sometimes worth taking on strategically — but it always has to be paid back eventually."
+      }
+    ]
+  }
+},
+
+// ─── MODULE 4 ───
+{
+  id: 4, title: "Data — The Real Foundation", time: "20 min",
+  lessons: [
+    { id: "4.1", title: "SQL and relational databases — deeper dive", body: `
+<p>SQL (Structured Query Language) is the language you use to talk to relational databases. It reads almost like English, which is why it's one of the most accessible technical skills for nontechnical people to pick up.</p>
+<p>A SQL query looks like this: <code>SELECT name, email FROM users WHERE signup_date > '2025-01-01' ORDER BY name</code>. Translation: "Give me the name and email of every user who signed up after January 1st, 2025, sorted alphabetically by name." That's it. You're asking a question and the database gives you the answer.</p>
+<p>The fundamental operations in SQL are often called <strong>CRUD</strong>: Create (INSERT), Read (SELECT), Update (UPDATE), Delete (DELETE). Every app with a database does some combination of these constantly. When you sign up for a service, that's an INSERT. When you view your profile, that's a SELECT. When you change your password, that's an UPDATE. When you delete your account, that's a DELETE.</p>
+<p>The real power of relational databases is the <strong>relational</strong> part — connecting data across tables. A JOIN lets you combine data from two tables based on a shared column. "Show me all orders with their customer names" requires joining the orders table to the customers table. Complex queries might join five or six tables together. When someone says "it's a query performance issue," they often mean a JOIN across large tables is taking too long.</p>
+<p><strong>Indexes</strong> are the other concept worth knowing. An index is like the index in the back of a textbook — it lets the database find rows quickly without scanning the entire table. Without an index, finding one user in a table of 10 million means checking all 10 million rows. With an index on the email column, it's nearly instant. But indexes have a cost: they slow down writes (because the index has to be updated too) and use disk space. Choosing which columns to index is a real engineering decision.</p>
+<div class="callout">
+<strong>Key principle:</strong> SQL is the most widely useful technical skill a nontechnical person can learn. You don't need to be an expert — just understanding SELECT, WHERE, JOIN, and GROUP BY lets you ask your own questions of the data instead of waiting for someone else to pull reports for you.
+</div>` },
+    { id: "4.2", title: "NoSQL, document stores, and when to use what", body: `
+<p>Not all data fits neatly into rows and columns. A user's profile might have a varying number of addresses, phone numbers, and social links. A product catalog might have completely different attributes for shoes vs. electronics vs. groceries. Forcing this kind of variable data into rigid tables creates ugly workarounds.</p>
+<p><strong>NoSQL databases</strong> solve this by storing data as flexible <strong>documents</strong> (usually JSON) instead of fixed rows. MongoDB is the most popular example. A document for a user might look like: <code>{"name": "Greg", "emails": ["greg@work.com", "greg@personal.com"], "preferences": {"theme": "dark"}}</code>. Each document can have different fields. No rigid schema required.</p>
+<p><strong>Key-value stores</strong> (Redis, DynamoDB) are even simpler — they're like giant dictionaries. You store a value under a key, and you retrieve it by that key. Extremely fast, extremely simple, but you can't easily search or query across values. They're perfect for caching (storing frequently-accessed data in memory for speed), session data, and real-time counters.</p>
+<p><strong>Graph databases</strong> (Neo4j) store data as nodes and relationships, making them ideal for social networks, recommendation engines, and fraud detection — anywhere the connections between data points matter as much as the data points themselves.</p>
+<p>The choice between SQL and NoSQL isn't about one being "better." It's about trade-offs. SQL gives you strong consistency, powerful querying, and well-understood patterns — but it's rigid and can be slow at massive scale. NoSQL gives you flexibility and horizontal scaling — but you lose some querying power and have to handle consistency yourself. Most large systems use both: a relational database for core business data and a NoSQL store for specific use cases.</p>
+<div class="callout">
+<strong>Key principle:</strong> Different data shapes call for different databases. When someone says "we're using Postgres for the core data and Redis for caching," they're making a pragmatic architectural decision to use the right tool for each job.
+</div>` },
+    { id: "4.3", title: "Data lakes, data warehouses, and the analytics stack", body: `
+<p>When a company grows, its data ends up scattered across dozens of systems — the product database, the payment processor, the email marketing tool, the CRM, the analytics platform, the ad network. Each system has its own slice of the truth. To understand the full picture, you need to pull all that data into one place. That's where <strong>data warehouses</strong> and <strong>data lakes</strong> come in.</p>
+<p>A <strong>data warehouse</strong> (Snowflake, BigQuery, Redshift) is a centralized database optimized for analytical queries — not for running your product, but for answering business questions. "What's our revenue by region by month?" "Which marketing channel has the best conversion rate?" "What's the average customer lifetime value?" These are warehouse questions. The data is cleaned, structured, and organized into a format that makes analysis fast and consistent.</p>
+<p>A <strong>data lake</strong> (S3, Azure Data Lake, Google Cloud Storage) is a more raw approach. Instead of cleaning and structuring the data upfront, you dump everything — structured, semi-structured, and unstructured — into cheap storage and figure out how to use it later. Raw log files, JSON blobs, CSV exports, images, video metadata — it all goes in the lake. The advantage is flexibility: you never throw data away. The disadvantage is that without discipline, a data lake becomes a <strong>data swamp</strong> — a disorganized mess where nobody can find anything.</p>
+<p>The modern analytics stack typically looks like this: data sources → <strong>ETL/ELT pipeline</strong> (tools like Fivetran, dbt, Airflow that extract, transform, and load data) → data warehouse → <strong>BI tools</strong> (Tableau, Looker, Mode) where business users can build dashboards and reports. This pipeline is often called the "data stack" and there are entire teams dedicated to building and maintaining it.</p>
+<div class="callout">
+<strong>Key principle:</strong> A data warehouse is for structured analytical queries. A data lake is for storing everything in raw form. Most companies need some version of both. The pipeline that moves and transforms data between systems is often more complex and fragile than the product itself.
+</div>` },
+    { id: "4.4", title: "Data pipelines, ETL, and why 'just pull the data' isn't simple", body: `
+<p>If you've ever asked an analyst "can you just pull the data on X?" and been told it'll take three days, the reason is almost always the <strong>data pipeline</strong>.</p>
+<p><strong>ETL</strong> stands for Extract, Transform, Load. Extract data from source systems (your product database, Salesforce, Google Analytics, etc.). Transform it — clean it up, standardize formats, join related data, calculate derived metrics, handle missing values. Load it into the warehouse where it can be queried. Every step can fail. The source system's API might change. The data format might be inconsistent. A null value might break the transformation. A schema change in the warehouse might invalidate existing queries.</p>
+<p>Modern teams often use <strong>ELT</strong> instead — Extract, Load, Transform — where you dump raw data into the warehouse first and transform it there, using tools like <strong>dbt</strong> (data build tool). dbt has become enormously popular because it lets analysts write transformations in SQL (which they already know) rather than requiring engineers to write Python scripts.</p>
+<p>Data pipelines run on <strong>schedules</strong> — often hourly or daily. This means the data in your warehouse is never perfectly real-time. When you look at a dashboard that says "revenue today," it might actually be "revenue as of the last pipeline run two hours ago." Understanding this lag is important for making decisions — especially time-sensitive ones.</p>
+<p>The hardest part of data work isn't running queries. It's <strong>data quality</strong>. Is this metric calculated the same way everywhere? Is the timestamp in UTC or local time? Are these two "customer_id" columns from different systems referring to the same customers? When your marketing team says "we had 10,000 signups" and your product team says "we had 8,000 signups," the discrepancy is almost certainly a data pipeline or definition issue, not a mystery.</p>
+<div class="callout">
+<strong>Key principle:</strong> Data doesn't magically appear in dashboards. It travels through a pipeline that extracts, transforms, and loads it — and every step is a potential point of failure. When "just pull the data" takes three days, it's because the pipeline is the hard part.
+</div>` }
+  ],
+  scenario: null,
+  quiz: {
+    questions: [
+      {
+        q: "What's the primary difference between a data warehouse and a data lake?",
+        options: [
+          "A warehouse is in the cloud, a lake is on-premise",
+          "A warehouse stores structured, cleaned data for analysis; a lake stores raw data in any format",
+          "A warehouse is for big companies, a lake is for startups",
+          "They're the same thing with different branding"
+        ],
+        correct: 1,
+        explanation: "Warehouses (Snowflake, BigQuery) are optimized for structured queries. Lakes (S3, Azure Data Lake) store everything raw. Most companies use both — the lake for storage, the warehouse for analysis."
+      },
+      {
+        q: "Your marketing team says 10,000 signups this month. Your product team says 8,000. What's the most likely explanation?",
+        options: [
+          "Someone is lying",
+          "The teams are defining \"signup\" differently or pulling from different data sources",
+          "The product database lost 2,000 records",
+          "Marketing is counting duplicates"
+        ],
+        correct: 1,
+        explanation: `Data discrepancies almost always come from different definitions, different source systems, or different pipeline timing. The first step is always "how are we each defining this metric?"`
+      }
+    ]
+  }
+},
+
+// ─── MODULE 5 ───
+{
+  id: 5, title: "Cloud & Infrastructure", time: "15 min",
+  lessons: [
+    { id: "5.1", title: "What 'the cloud' actually means", body: `
+<p>"The cloud" is not a place. It's someone else's computers. When a company says "we're moving to the cloud," they mean they're moving from running software on physical servers they own to running it on servers owned and managed by Amazon (AWS), Microsoft (Azure), or Google (GCP).</p>
+<p>Before the cloud, if you wanted to launch a web application, you had to buy physical servers, put them in a data center, wire up the networking, install the operating system, configure the software, and hire people to maintain everything. If your app got popular and you needed more capacity, you'd order more servers, wait weeks for delivery, set them up, and hope you didn't run out of capacity in the meantime. If your app flopped, you had a closet full of expensive hardware collecting dust.</p>
+<p>Cloud computing eliminated this. With AWS, you can spin up a new server in 60 seconds, use it for an hour, and pay a few cents. Need 100 servers for a big product launch? Click a button. Need to scale back down when traffic normalizes? Click another button. This <strong>elasticity</strong> — the ability to scale resources up and down on demand — is the fundamental value proposition of the cloud.</p>
+<p>The three major cloud providers — <strong>AWS</strong> (Amazon Web Services), <strong>Azure</strong> (Microsoft), and <strong>GCP</strong> (Google Cloud Platform) — collectively run a huge portion of the internet. They don't just provide servers. They offer hundreds of services: databases, file storage, machine learning tools, email delivery, message queues, DNS management, content delivery networks, and much more. Each service is a building block that developers can use instead of building from scratch.</p>
+<div class="callout">
+<strong>Key principle:</strong> "The cloud" is rented infrastructure. It replaced the need to own and maintain physical servers with a pay-as-you-go model that scales on demand. When someone mentions AWS, Azure, or GCP, they're talking about where the software runs and the building blocks it's composed of.
+</div>` },
+    { id: "5.2", title: "Servers, containers, and serverless", body: `
+<p>A <strong>server</strong> is just a computer that runs software and responds to requests. When 1,000 people visit your website simultaneously, a server (or group of servers) handles all those requests. But how software runs on those servers has evolved dramatically.</p>
+<p><strong>Virtual machines (VMs)</strong> were the first big innovation. Instead of one application per physical server, you could run multiple isolated "virtual" computers on a single physical machine. Each VM has its own operating system and behaves like a separate computer. This was more efficient but still heavy — each VM consumes significant resources just for its operating system.</p>
+<p><strong>Containers</strong> (Docker is the dominant tool) are a lighter alternative. A container packages an application with everything it needs to run — code, libraries, settings — without needing its own operating system. Containers share the host machine's operating system, making them much faster to start and more efficient with resources. When a developer says "it's containerized" or "it runs in Docker," they mean the application is packaged in a portable, self-contained unit that runs the same way everywhere.</p>
+<p><strong>Serverless</strong> (AWS Lambda, Google Cloud Functions) takes it a step further. You don't manage servers at all. You write a function, upload it, and the cloud provider runs it whenever it's triggered — by an API call, a file upload, a scheduled timer, or an event. You pay only for the exact computation time used. The name "serverless" is misleading — there are absolutely still servers involved. You just don't have to think about them.</p>
+<p><strong>Kubernetes</strong> (often abbreviated K8s) is an orchestration system for managing containers at scale. If Docker is a shipping container, Kubernetes is the port authority — it decides which containers run where, scales them up and down based on demand, and restarts them if they crash. It's powerful but complex, and its complexity is a recurring source of engineering jokes and headaches.</p>
+<div class="callout">
+<strong>Key principle:</strong> The evolution went from physical servers → virtual machines → containers → serverless. Each step traded control for convenience. Understanding where your company's software sits on this spectrum tells you a lot about their infrastructure maturity and operational costs.
+</div>` },
+    { id: "5.3", title: "Scaling — why 'just add more servers' isn't simple", body: `
+<p>When an app gets popular, it needs to handle more users, more data, and more requests. This is called <strong>scaling</strong>, and it's where simple things become hard.</p>
+<p><strong>Vertical scaling</strong> means making a single server bigger — more CPU, more memory, more storage. It's simple but has limits. You can't make one machine infinitely powerful, and bigger machines get disproportionately expensive.</p>
+<p><strong>Horizontal scaling</strong> means adding more servers and distributing the work across them. This is more powerful but vastly more complex. Now you have to answer questions like: how do you distribute requests across multiple servers (load balancing)? If a user's data is on server A, what happens when their next request goes to server B (session management)? How do you keep the databases in sync across servers (replication)? What happens when one server fails (fault tolerance)?</p>
+<p>A <strong>load balancer</strong> sits in front of multiple servers and distributes incoming requests among them. It's like a host at a restaurant directing diners to open tables. If one server goes down, the load balancer routes traffic to the remaining healthy servers. This is the most basic building block of horizontal scaling.</p>
+<p><strong>Caching</strong> is the other major scaling tool. Instead of computing the same result over and over, you store it temporarily and serve the stored version. A product page that gets 10,000 views per hour doesn't need to query the database 10,000 times — you query it once, cache the result, and serve the cache. Redis and Memcached are popular caching tools. CDNs (Content Delivery Networks) like Cloudflare are essentially a global cache for static content — they store copies of your images, JavaScript, and CSS at servers around the world so users get content from a nearby server instead of yours.</p>
+<div class="callout">
+<strong>Key principle:</strong> Scaling is where engineering meets economics. Every scaling decision is a trade-off between performance, complexity, reliability, and cost. When an engineering team says "we need to rethink our architecture to support growth," this is what they mean.
+</div>` },
+    { id: "5.4", title: "Monitoring, uptime, and why things break", body: `
+<p>Production systems fail. The question isn't if but when and how badly. What separates good engineering teams from bad ones isn't preventing all failures — it's detecting them fast, understanding them quickly, and recovering gracefully.</p>
+<p><strong>Monitoring</strong> is the practice of collecting data about how your systems are performing in real time. CPU usage, memory consumption, response times, error rates, database query speeds, queue lengths — all of this is continuously measured and displayed in dashboards (tools like Datadog, Grafana, New Relic). When a metric crosses a threshold — say, error rate exceeds 1% — an <strong>alert</strong> fires, paging the on-call engineer.</p>
+<p><strong>Uptime</strong> is measured in "nines." 99% uptime sounds great until you do the math: that's 3.65 days of downtime per year. 99.9% (three nines) is 8.7 hours per year. 99.99% (four nines) is 52 minutes per year. 99.999% (five nines) is 5 minutes per year. Each additional nine is exponentially harder and more expensive to achieve.</p>
+<p>When things do break, teams conduct <strong>postmortems</strong> (also called incident reviews or retrospectives). The goal isn't blame — it's learning. What failed? What was the root cause? Why didn't our monitoring catch it sooner? What will we change to prevent it from happening again? Good postmortem culture is blameless and focused on systemic improvements rather than individual mistakes.</p>
+<div class="callout">
+<strong>Key principle:</strong> Reliable systems aren't the ones that never fail. They're the ones that fail gracefully, detect problems quickly, and learn from every incident. If your company doesn't do postmortems, it's repeating the same failures.
+</div>` }
+  ],
+  scenario: null,
+  quiz: {
+    questions: [
+      {
+        q: `A developer says "we can deploy that as a Lambda function." What are they suggesting?`,
+        options: [
+          "Running it on a dedicated server 24/7",
+          "Running it as serverless code that only executes when triggered, with no server management",
+          "Running it in a Docker container",
+          "Running it on the developer's local machine"
+        ],
+        correct: 1,
+        explanation: "AWS Lambda (and similar services) run your code only when needed — triggered by events, API calls, or schedules. You don't manage any servers. You pay only for execution time."
+      },
+      {
+        q: "Your site goes from 1,000 to 100,000 daily users. What's the first thing the engineering team likely needs?",
+        options: [
+          "A bigger office",
+          "Load balancing and caching to distribute traffic across multiple servers",
+          "A complete rewrite of the application",
+          "A new domain name"
+        ],
+        correct: 1,
+        explanation: "Horizontal scaling (load balancers to distribute traffic, caching to reduce redundant computation) is the standard first response to traffic growth. A complete rewrite is almost never the right first move."
+      }
+    ]
+  }
+},
+
+// ─── MODULE 6 ───
+{
+  id: 6, title: "Security & Privacy", time: "12 min",
+  lessons: [
+    { id: "6.1", title: "Authentication vs authorization", body: `
+<p>These two words sound similar but mean completely different things, and confusing them is one of the most common mistakes in both conversations and code.</p>
+<p><strong>Authentication</strong> is proving who you are. When you enter your username and password, you're authenticating — proving to the system that you are who you claim to be. Multi-factor authentication (MFA) adds a second proof: something you know (password) plus something you have (phone) or something you are (fingerprint). OAuth (the "Sign in with Google" button) is an authentication protocol that lets you prove your identity through a trusted third party rather than creating a new password.</p>
+<p><strong>Authorization</strong> is determining what you're allowed to do. After the system knows who you are (authentication), it checks what permissions you have (authorization). You might be authenticated as an employee but not authorized to view payroll data. You might be authorized to read a document but not to edit it.</p>
+<p>A real-world analogy: authentication is showing your ID at the door. Authorization is the bouncer checking whether your name is on the VIP list. You can prove who you are (authenticated) and still be told "you don't have access to that" (not authorized).</p>
+<p>In APIs, this distinction manifests as <strong>API keys</strong> and <strong>tokens</strong>. An API key authenticates your application ("this request is from our app"). A token — often a JWT (JSON Web Token) — authenticates and authorizes a specific user ("this request is from Greg, who has admin access"). When you see "401 Unauthorized" in an error log, it usually means authentication failed. "403 Forbidden" means authentication succeeded but authorization failed.</p>
+<div class="callout">
+<strong>Key principle:</strong> Authentication = who are you? Authorization = what can you do? They're separate systems and getting either wrong can be catastrophic.
+</div>` },
+    { id: "6.2", title: "Common vulnerabilities in plain English", body: `
+<p>You don't need to be a security expert, but knowing the most common attack types makes you a better decision-maker.</p>
+<p><strong>SQL injection</strong> is when an attacker inserts malicious database commands through an input field. If a login form naively puts your username directly into a SQL query, an attacker can type something that changes the query itself — potentially accessing, modifying, or deleting the entire database. This is one of the oldest and most common web attacks, and the fix (parameterized queries) is well-known but still frequently forgotten.</p>
+<p><strong>Cross-site scripting (XSS)</strong> is when an attacker injects malicious JavaScript into a web page that other users see. If a comment section doesn't properly sanitize input, an attacker could post a "comment" that's actually a script that steals other users' session cookies when they view the page. The fix is sanitizing all user input — treating everything a user types as potentially dangerous.</p>
+<p><strong>Phishing</strong> isn't a software vulnerability — it's a human one. Trick someone into entering credentials on a fake login page and you have their password. No amount of code security prevents a user from willingly giving away their password to a convincing fake. This is why multi-factor authentication matters — even if the password is compromised, the attacker still needs the second factor.</p>
+<p><strong>Data breaches</strong> happen when an attacker gains access to a database containing sensitive information. The impact depends entirely on how the data was stored. Passwords should be <strong>hashed</strong> (irreversibly transformed into a random-looking string) so that even if the database is stolen, the actual passwords are unrecoverable. If passwords are stored in plain text — which still happens more than you'd think — a breach exposes every user's actual password.</p>
+<div class="callout">
+<strong>Key principle:</strong> Security is not a feature you add at the end. It's a practice embedded in every line of code, every architectural decision, and every user interaction. The most common attacks exploit predictable, well-known vulnerabilities that simply weren't addressed.
+</div>` },
+    { id: "6.3", title: "Privacy, compliance, and why engineers care", body: `
+<p>Privacy regulations like <strong>GDPR</strong> (Europe), <strong>CCPA</strong> (California), and others aren't just legal requirements — they directly shape how software is built.</p>
+<p>GDPR, for example, gives users the "right to be forgotten" — they can demand that a company delete all their personal data. This sounds simple until you realize that user data might be scattered across 15 different databases, cached in multiple systems, embedded in log files, replicated across backup systems, and referenced in analytics pipelines. Building a "delete my data" feature that actually deletes data everywhere is a significant engineering challenge.</p>
+<p><strong>Data minimization</strong> — collecting only the data you actually need — is both a legal principle and a technical one. Every piece of data you store is a piece of data you have to secure, maintain, and potentially delete. The safest data is data you never collected in the first place.</p>
+<p><strong>Encryption</strong> protects data in two states: <strong>at rest</strong> (stored on disk) and <strong>in transit</strong> (moving across a network). HTTPS — the padlock in your browser — encrypts data in transit so that someone intercepting your network traffic can't read it. Encryption at rest means that even if someone physically steals a hard drive, they can't read the data without the encryption key.</p>
+<div class="callout">
+<strong>Key principle:</strong> Privacy and security aren't obstacles to building software — they're requirements. They affect database design, API design, data retention policies, and feature architecture. The best time to think about them is at the beginning of a project, not after a breach.
+</div>` }
+  ],
+  scenario: null,
+  quiz: {
+    questions: [
+      {
+        q: `Your app returns a "403 Forbidden" error when a logged-in user tries to access a page. What's happening?`,
+        options: [
+          "The user's password is wrong",
+          "The server is down",
+          "The user is authenticated but not authorized to access that resource",
+          "The page doesn't exist"
+        ],
+        correct: 2,
+        explanation: "403 means the server knows who you are (authentication succeeded) but you don't have permission (authorization denied). 401 would mean authentication failed. 404 would mean the page doesn't exist."
+      }
+    ]
+  }
+},
+
+// ─── MODULE 7 ───
+{
+  id: 7, title: "Product Management & Agile", time: "15 min",
+  lessons: [
+    { id: "7.1", title: "Agile, sprints, and how teams actually work", body: `
+<p><strong>Agile</strong> is a philosophy for building software: instead of planning everything upfront and delivering one big release, build in small increments, get feedback, and adjust. The most popular implementation is <strong>Scrum</strong>, which structures work into <strong>sprints</strong> — usually two-week cycles.</p>
+<p>Each sprint follows a rhythm. It starts with <strong>sprint planning</strong>, where the team selects items from the <strong>backlog</strong> (a prioritized list of all work to be done) and commits to completing them. During the sprint, the team works on those items. Each day starts with a <strong>standup</strong> — a brief meeting (ideally 15 minutes) where everyone shares what they did yesterday, what they're doing today, and if anything is blocking them. At the end, there's a <strong>sprint review</strong> (demo what was built) and a <strong>retrospective</strong> (discuss what went well and what to improve).</p>
+<p><strong>Story points</strong> are how teams estimate work. Instead of hours or days, they use abstract units that represent complexity and effort. A simple bug fix might be 1 point. A new feature with database changes, API updates, and frontend work might be 8 points. The abstraction sounds weird but it works — it separates "how long will this take" from "how hard is this," which are different questions. Over time, teams develop a <strong>velocity</strong> — the average number of points they complete per sprint — which becomes a reliable planning tool.</p>
+<p><strong>Kanban</strong> is an alternative to Scrum. Instead of fixed sprints, work flows continuously through stages: To Do → In Progress → In Review → Done. There are limits on how many items can be in each stage at once (called <strong>WIP limits</strong> — work in progress limits). If the "In Review" column is full, the team stops starting new work and focuses on reviewing. This prevents bottlenecks and keeps work flowing smoothly.</p>
+<div class="callout">
+<strong>Key principle:</strong> Agile isn't a rigid process — it's a set of principles about iteration, feedback, and adaptation. The specific implementation (Scrum, Kanban, or a hybrid) matters less than the underlying discipline of shipping small increments and learning from them.
+</div>` },
+    { id: "7.2", title: "Roadmaps, backlogs, and prioritization", body: `
+<p>A <strong>roadmap</strong> is a strategic plan for where a product is going. It's not a promise — it's a direction. Good roadmaps communicate themes and priorities ("Q2 is about improving onboarding, Q3 is about enterprise features") rather than specific feature commitments with hard dates. The moment a roadmap becomes a list of features with deadlines, it becomes a fiction that everyone pretends to believe.</p>
+<p>The <strong>backlog</strong> is where all the work lives — feature ideas, bug reports, technical debt items, research spikes. A healthy backlog is prioritized ruthlessly. The top items are well-defined and ready to work on. The bottom items might never get done, and that's fine. An overstuffed backlog where everything is "high priority" is the same as nothing being prioritized.</p>
+<p>Prioritization frameworks help teams make decisions systematically. <strong>RICE</strong> (Reach × Impact × Confidence / Effort) scores each item by how many users it affects, how much it matters, how confident you are in those estimates, and how much effort it requires. <strong>MoSCoW</strong> (Must have, Should have, Could have, Won't have) is simpler — it forces you to put items into buckets. The specific framework matters less than having a disciplined process that prevents the loudest stakeholder from always winning.</p>
+<div class="callout">
+<strong>Key principle:</strong> The most important product skill isn't adding things to the roadmap — it's removing them. Every feature you say yes to is a feature that takes time away from something else. The best PMs are the ones who can say "not now" and explain why convincingly.
+</div>` },
+    { id: "7.3", title: "User stories, acceptance criteria, and 'definition of done'", body: `
+<p>A <strong>user story</strong> is a description of a feature from the user's perspective: "As a [type of user], I want [something] so that [reason]." For example: "As a team manager, I want to export my team's timesheet data as a CSV so that I can submit it to payroll." The format forces you to think about who needs it, what they need, and why.</p>
+<p><strong>Acceptance criteria</strong> define what "done" means for a user story. They're the checklist that determines whether the implementation actually satisfies the requirement. For the timesheet export: "The export includes all team members. Dates default to the current pay period. The CSV opens correctly in Excel. If there are no entries, the export shows headers with no data rows rather than failing."</p>
+<p>Without clear acceptance criteria, "done" is subjective. The developer thinks it's done when the export button works. The PM thinks it's done when it handles all edge cases. The designer thinks it's done when it matches the mockups. This misalignment causes rework, frustration, and shipped features that technically work but don't actually solve the user's problem.</p>
+<p>The <strong>definition of done</strong> (DoD) is the team's universal standard for when any work item is truly complete. It typically includes: code is written and tested, pull request is reviewed and approved, documentation is updated, the feature works in staging, and the PM has signed off. Without a DoD, "done" means different things to different people, and partially-finished work accumulates.</p>
+<div class="callout">
+<strong>Key principle:</strong> Vague requirements produce vague results. The time spent writing clear user stories and acceptance criteria before development starts pays for itself many times over in reduced rework and miscommunication.
+</div>` },
+    { id: "7.4", title: "The PM-engineering relationship", body: `
+<p>The relationship between product managers and engineers is one of the most important dynamics in any software organization, and also one of the most fraught.</p>
+<p>The PM's job is to decide <strong>what</strong> to build and <strong>why</strong>. The engineer's job is to decide <strong>how</strong> to build it and to flag when the "what" is infeasible, dangerous, or more complex than it appears. When this boundary is respected, the relationship is productive. When it's violated — PMs dictating technical implementation, engineers ignoring business requirements — everything breaks down.</p>
+<p>The best PMs bring engineers into the "why" early. Instead of handing over a fully-specified feature requirement, they share the problem they're trying to solve and ask for input on possible solutions. Engineers often see options that PMs don't, and they can flag technical constraints that fundamentally reshape the approach. The worst PMs treat engineers as order-takers — "build exactly this" — and then are surprised when the result doesn't solve the actual problem.</p>
+<p>Engineers earn trust by communicating proactively — flagging risks early, explaining trade-offs in business terms (not technical jargon), and being honest about uncertainty rather than giving optimistic estimates. The worst engineers say "that's technically impossible" when they mean "that's hard," or go silent for two weeks and then reveal a problem that could have been caught on day one.</p>
+<div class="callout">
+<strong>Key principle:</strong> The PM-engineering relationship works best when both sides understand and respect the boundary between "what/why" (PM's domain) and "how" (engineering's domain), while collaborating actively in the overlap.
+</div>` }
+  ],
+  scenario: {
+    situation: `You're reviewing the sprint backlog. There are 12 items, and the team's velocity suggests they can complete about 8 points this sprint. Three stakeholders each insist their item is the highest priority. One is a revenue-impacting bug, one is a feature requested by the biggest client, and one is a security vulnerability flagged by the engineering team.`,
+    prompt: "How do you prioritize?",
+    options: [
+      { text: "The revenue bug — money comes first", id: "a" },
+      { text: "The client feature — losing the biggest client would be worse", id: "b" },
+      { text: "The security vulnerability — risk of breach outweighs both", id: "c", correct: true },
+      { text: "Split the sprint evenly across all three", id: "d" }
+    ],
+    explanation: `Option C. Security vulnerabilities represent existential risk — a breach can damage reputation, trigger regulatory action, and cost far more than lost revenue or a delayed feature. The revenue bug is second priority (it's actively costing money), and the client feature is third (important but not urgent if the client isn't about to churn). This is a case where the right answer isn't the one that feels most productive — it's the one that reduces the highest risk.`
+  },
+  quiz: {
+    questions: [
+      {
+        q: "A team's sprint velocity is 20 points. A stakeholder wants a 15-point feature and a 10-point feature in the same sprint. What's the right response?",
+        options: [
+          "Commit to both — the team will figure it out",
+          "Explain that 25 points exceeds capacity and ask which is higher priority",
+          "Split both features in half across two sprints",
+          "Add more developers to increase velocity"
+        ],
+        correct: 1,
+        explanation: "Overcommitting to exceed velocity leads to burnout, cut corners, and missed sprints. Velocity is an empirical measure — it's what the team can reliably deliver. The productive move is prioritization, not wishful thinking."
+      }
+    ]
+  }
+},
+
+// ─── MODULE 8 ───
+{
+  id: 8, title: "AI Products Are Still Software", time: "20 min",
+  lessons: [
+    { id: "8.1", title: "AI is workflows around probabilistic models", body: `
+<p>Here's the single most important mental model for understanding AI products: <strong>AI is not magic — it's software with a probabilistic component.</strong> A traditional app has deterministic logic: the same input always produces the same output. An AI app has a model at its core that produces <em>probable</em> outputs — the same input might produce slightly different results each time, and some of those results might be wrong.</p>
+<p>This is a fundamental shift. In traditional software, a bug means the code is doing something wrong. In AI software, the model might be doing exactly what it's designed to do and still produce an incorrect result. A language model generates the most statistically likely next token — that's its job. If the statistically likely response happens to be factually wrong (a "hallucination"), the model isn't broken. It's working as intended in a way that produces an undesirable outcome.</p>
+<p>Every AI product you've used is mostly <em>non-AI software</em> surrounding a model. ChatGPT is a web application (frontend, backend, databases, authentication, billing) with a language model in the middle. The model generates text. Everything else — the chat interface, conversation history, file uploads, tool usage, safety filters, rate limiting — is traditional software engineering.</p>
+<p>This is why "demos lie and products are hard." A demo shows the model working under ideal conditions with a curated prompt. A product has to handle every possible input, fail gracefully, manage costs, enforce safety, handle scale, and meet user expectations — all of which are engineering problems, not model problems.</p>
+<div class="callout">
+<strong>Key principle:</strong> AI products = traditional software engineering + a probabilistic model + the workflows needed to make that model useful and reliable. The AI part is often less than 20% of the total work. The other 80% is everything we've covered in this course.
+</div>` },
+    { id: "8.2", title: "Prompting vs workflows vs agents", body: `
+<p>These three concepts represent increasing levels of sophistication in how AI is used, and understanding the spectrum helps you evaluate AI product claims.</p>
+<p><strong>Prompting</strong> is the simplest: you write a text instruction and send it to a model. "Summarize this document." "Translate this to Spanish." "Write a marketing email for our new product." One input, one output. This is how most people interact with AI today.</p>
+<p><strong>Workflows</strong> are multi-step processes where the output of one AI call feeds into the next, often with traditional code in between. Example: extract key facts from a document (AI call #1) → look up those facts in a database (code) → generate a report comparing the facts to historical data (AI call #2) → format the report as a PDF (code). Workflows are where AI gets genuinely powerful because you're combining the model's capabilities with structured data and logic.</p>
+<p><strong>Agents</strong> are the frontier. An agent is an AI system that can decide what to do next, use tools, and iterate. Instead of following a fixed workflow, an agent assesses the situation, picks the appropriate tool (search the web, query a database, call an API, write code), observes the result, and decides its next action. In theory, agents can handle complex, open-ended tasks autonomously. In practice, they're still unreliable for anything mission-critical because each decision point is a place where the probabilistic model might go wrong.</p>
+<p>The hype cycle is currently at "agents will replace workers." The reality is closer to "agents will automate specific, bounded tasks with human oversight for anything important." The gap between a demo of an agent booking a flight and a production system that reliably books the right flight, handles errors, manages cancellations, and doesn't accidentally spend $10,000 is enormous.</p>
+<div class="callout">
+<strong>Key principle:</strong> Prompting is a single turn. Workflows are multi-step with logic in between. Agents make their own decisions. Each level is more powerful and more fragile. Most real production AI is workflows, not agents.
+</div>` },
+    { id: "8.3", title: "MCPs — the Model Context Protocol", body: `
+<p><strong>MCP</strong> (Model Context Protocol) is an open standard that solves a specific problem: how do AI models connect to external tools and data sources in a consistent, reusable way?</p>
+<p>Before MCP, if you wanted Claude to access your company's Salesforce data, someone had to build a custom integration. If you also wanted it to access Google Drive, someone had to build another custom integration. And if you switched from Claude to GPT, every integration had to be rebuilt from scratch. This is called the <strong>N×M problem</strong> — N AI models times M tools equals a lot of custom connectors.</p>
+<p>MCP standardizes this. An MCP <strong>server</strong> is a small program that exposes a tool or data source in a standardized format. An MCP <strong>client</strong> (built into the AI application) can connect to any MCP server. So a Salesforce MCP server works with Claude, GPT, Gemini, or any other AI that supports the protocol — just like a USB cable works with any USB device.</p>
+<p>The architecture has three layers. The <strong>host</strong> is the AI application (like Claude Desktop or an IDE). The <strong>client</strong> lives inside the host and manages connections to servers. The <strong>servers</strong> are the tools — a Slack server that can search messages, a GitHub server that can create pull requests, a database server that can run queries. When you ask Claude "find the latest sales report in our database and email it to my manager," MCP is what lets Claude actually do both of those things by calling the appropriate servers.</p>
+<p>MCP matters because it's becoming the standard. Anthropic created it, but OpenAI, Google, and the broader ecosystem have adopted it. There are already tens of thousands of MCP servers for different tools and services. It's the protocol that makes AI agents practical — without a standard way to connect to tools, agents are limited to whatever was hardcoded into them.</p>
+<div class="callout">
+<strong>Key principle:</strong> MCP is USB for AI — a universal standard for connecting AI models to external tools and data. It solves the integration problem that previously required custom code for every model-tool combination. If someone says "we have an MCP server for that," they mean the tool is ready for any MCP-compatible AI to use.
+</div>` },
+    { id: "8.4", title: "RAG, structured output, and grounding", body: `
+<p>Three concepts that come up constantly in AI product discussions:</p>
+<p><strong>RAG</strong> (Retrieval-Augmented Generation) is a technique where the AI searches for relevant information before generating a response. Instead of relying solely on what the model "knows" from training, RAG retrieves specific documents, database entries, or web pages and feeds them to the model as context. "Answer this question using the information in these three documents" is fundamentally more reliable than "answer this question from memory." RAG is how most enterprise AI products work — they search your company's knowledge base first, then generate a response grounded in your actual data.</p>
+<p><strong>Structured output</strong> means getting the AI to produce data in a specific, predictable format (usually JSON) rather than free-form text. If you're building a workflow where the AI extracts invoice data, you need it to return <code>{"vendor": "Acme", "amount": 1500, "date": "2025-03-15"}</code> — not a paragraph describing the invoice. Structured output turns AI from a conversational tool into a component you can plug into automated systems.</p>
+<p><strong>Grounding</strong> is the broader concept of connecting AI outputs to verifiable reality. Citations (linking to sources), tool use (checking facts against databases), and human review are all forms of grounding. The fundamental challenge with AI is that it generates plausible-sounding text that may or may not be true. Every technique for making AI more reliable is ultimately a form of grounding — anchoring its outputs to something real.</p>
+<div class="callout">
+<strong>Key principle:</strong> RAG is "look it up before answering." Structured output is "give me data, not prose." Grounding is "prove it." These three patterns are the building blocks of AI products that are actually reliable enough to trust.
+</div>` },
+    { id: "8.5", title: "Why demos lie and products are hard", body: `
+<p>A demo is a controlled performance. A product is reality.</p>
+<p>In a demo, the prompt is carefully crafted. The data is clean. The edge cases are avoided. The model gets one chance to impress, and if it fails, the presenter runs it again. You see the best 5% of outputs. In a product, every user brings their own messy, ambiguous, unexpected input. The data is incomplete. The edge cases are the majority of real usage. The model has to work every time, and when it fails, there's no presenter to intervene — there's a frustrated user.</p>
+<p>The gap between demo and product includes: <strong>prompt engineering at scale</strong> (writing prompts that work for 1,000 different inputs, not just the one in the demo), <strong>error handling</strong> (what happens when the model generates garbage), <strong>cost management</strong> (each API call costs money, and costs add up fast at scale), <strong>latency</strong> (users expect responses in seconds, not minutes), <strong>safety</strong> (preventing the model from saying harmful things), <strong>evaluation</strong> (how do you even measure if the AI is doing a good job?), and <strong>edge cases</strong> (the weird inputs that break everything).</p>
+<p>This is why so many AI startups have impressive demos and struggling products. The demo is the easy part. The product is where all the engineering lessons from the rest of this course — state management, API design, error handling, scaling, monitoring, security — come back as requirements. AI doesn't exempt you from software engineering. It adds a new, uniquely unpredictable component on top of all the existing challenges.</p>
+<div class="callout">
+<strong>Key principle:</strong> The hardest part of building AI products isn't the AI. It's everything around it. Be skeptical of any demo that doesn't address error handling, edge cases, cost, and scale. Those are the problems that determine whether a demo becomes a product.
+</div>` }
+  ],
+  scenario: null,
+  quiz: {
+    questions: [
+      {
+        q: "What is MCP (Model Context Protocol)?",
+        options: [
+          "A way to encrypt AI model weights",
+          "A standardized protocol for connecting AI models to external tools and data sources",
+          "A new AI model from Anthropic",
+          "A security framework for AI applications"
+        ],
+        correct: 1,
+        explanation: "MCP is an open standard — like USB for AI. It provides a universal way for AI applications to connect to tools (databases, APIs, file systems) without custom integrations for each model-tool combination."
+      },
+      {
+        q: `A startup shows you a demo where their AI agent perfectly handles a complex customer service interaction. What should you ask?`,
+        options: [
+          '"Can I invest?"',
+          '"How does it handle edge cases, errors, and inputs outside the demo scenario?"',
+          '"Which model are you using?"',
+          '"How many customers do you have?"'
+        ],
+        correct: 1,
+        explanation: "Demos are curated. The real test is how the system handles the messy, unpredictable reality of actual users. Edge case handling, error recovery, and cost at scale are what separate demos from products."
+      },
+      {
+        q: "RAG (Retrieval-Augmented Generation) is best described as:",
+        options: [
+          "A new type of AI model",
+          "Searching for relevant information before generating a response, so the AI's answer is grounded in actual data",
+          "A way to make AI models smaller",
+          "A database technology"
+        ],
+        correct: 1,
+        explanation: "RAG retrieves relevant documents or data first, then feeds them to the model as context. This grounds the response in real information rather than relying on the model's training data alone."
+      }
+    ]
+  }
+},
+
+// ─── MODULE 9 ───
+{
+  id: 9, title: "How to Talk to Technical People", time: "15 min",
+  lessons: [
+    { id: "9.1", title: "Good questions vs bad questions", body: `
+<p>The fastest way to earn credibility in a technical conversation is asking good questions. The fastest way to lose it is asking bad ones. The difference isn't about knowledge — it's about precision.</p>
+<p><strong>Bad question:</strong> "Why is the app slow?" This is vague enough to be unanswerable. Slow for whom? On what device? Which part of the app? Slow compared to what? The engineer now has to ask five clarifying questions before they can even begin to think about the answer.</p>
+<p><strong>Good question:</strong> "The dashboard takes about 8 seconds to load for users with more than 1,000 records. Is that a query issue or a rendering issue?" This is specific, measurable, and shows you've already done some thinking. It gives the engineer a starting point and demonstrates that you understand the frontend/backend distinction.</p>
+<p>The formula is: <strong>observation + specificity + a hypothesis (even if wrong)</strong>. "I noticed X. It seems to happen when Y. Could it be related to Z?" This gives the engineer something to work with. Even if your hypothesis is wrong, the fact that you offered one shows you're engaged and thinking, not just lobbing complaints over the wall.</p>
+<p>Questions that build credibility: "What are the trade-offs between those two approaches?" "What breaks if we do it that way?" "Is this the kind of thing that gets harder to change later?" "What would you need to be confident in that estimate?"</p>
+<p>Questions that destroy credibility: "Can you just...?" "Why can't you just...?" "How hard can it be?" "Shouldn't this be easy?" Each of these implies the work is trivial and the engineer is either lazy or incompetent.</p>
+<div class="callout">
+<strong>Key principle:</strong> Good questions demonstrate that you respect the complexity of the work. They're specific, they show your own thinking, and they invite collaboration rather than demanding answers.
+</div>` },
+    { id: "9.2", title: "Signals that build credibility", body: `
+<p>Technical credibility for nontechnical people isn't about knowing how to code. It's about demonstrating that you understand how software works well enough to make good decisions and communicate effectively.</p>
+<p><strong>Acknowledge uncertainty honestly.</strong> "I don't fully understand the implications of that — can you walk me through the trade-offs?" is far more credible than pretending to understand and making a bad decision. Engineers will forgive not knowing something. They will not forgive faking it and then blaming them when the decision goes wrong.</p>
+<p><strong>Use the right vocabulary at the right level.</strong> You don't need to say "let's refactor the GraphQL resolver to reduce N+1 queries." But saying "the dashboard seems to make too many database calls — is there a way to batch them?" shows you understand the concept without pretending to know the implementation.</p>
+<p><strong>Reference data and specifics.</strong> "Users are complaining about speed" is weak. "Our P95 response time went from 200ms to 1.2 seconds after last week's deploy" is strong. Even if you got that number from a dashboard someone else built, citing it shows you're grounded in reality.</p>
+<p><strong>Follow up on technical discussions.</strong> If the team discussed a trade-off in last week's meeting, reference it: "We decided to go with the simpler approach last week — how's that working out?" This shows you're paying attention and care about the outcomes, not just the decisions.</p>
+<div class="callout">
+<strong>Key principle:</strong> Credibility comes from honesty, specificity, and follow-through — not from technical knowledge. The nontechnical people that engineers respect most are the ones who ask sharp questions, acknowledge what they don't know, and hold everyone (including themselves) accountable for outcomes.
+</div>` },
+    { id: "9.3", title: "Signals that destroy credibility", body: `
+<p>Some behaviors reliably destroy your credibility with technical teams. They're worth knowing so you can avoid them.</p>
+<p><strong>"That should be easy."</strong> Unless you've built it before, you don't know that. And even if it seems simple, the edge cases, testing, security implications, and integration work might make it much harder than it appears. This phrase signals that you don't respect the complexity of the work.</p>
+<p><strong>Comparing to other products.</strong> "Twitter has this feature, so it can't be that hard." Twitter also has 1,000+ engineers and a decade of infrastructure. Your comparison dismisses the fundamental difference in resources, codebase, and context.</p>
+<p><strong>Scope creep disguised as clarity.</strong> "Oh, and it should also..." after the work is already estimated and planned. Each addition resets the scope and invalidates previous estimates. If you have new requirements, own them as new requirements — don't sneak them in as "obvious" additions.</p>
+<p><strong>Treating estimates as promises.</strong> An estimate is a prediction under uncertainty. Treating it as a contractual commitment creates a culture where engineers pad estimates defensively, which is worse for everyone.</p>
+<p><strong>Going around the team.</strong> Making technical decisions without consulting engineers, then informing them. "I told the client we'd have it by Friday" when you haven't checked with the team is a credibility-destroying move that also happens to be terrible management.</p>
+<div class="callout">
+<strong>Key principle:</strong> Credibility with technical teams is hard to build and easy to destroy. The common thread in all credibility-destroying behaviors is disrespecting the complexity, autonomy, or expertise of the people doing the work.
+</div>` },
+    { id: "9.4", title: "Knowing when you're out of your depth", body: `
+<p>There will be moments in technical conversations where you have no idea what's being discussed. Database indexing strategies, caching invalidation, distributed consensus algorithms, container orchestration — these are deep technical domains where a nontechnical person genuinely can't contribute to the "how."</p>
+<p>The skill isn't avoiding these moments. It's <strong>recognizing them accurately and responding productively.</strong></p>
+<p>First, distinguish between "I don't understand this yet" and "this isn't my domain." If a concept keeps coming up in your work, invest time in learning the basics. If it's a one-time deep technical discussion, it's fine to listen and focus on the parts that affect your decisions.</p>
+<p>Second, <strong>know your entry points.</strong> Even in deeply technical discussions, there are always questions you can and should ask: "What's the risk if this goes wrong?" "How does this affect the timeline?" "What are we trading off?" "Do we need to make this decision now or can we revisit it?" These questions are always relevant and always within your domain.</p>
+<p>Third, <strong>invest in learning the areas where you're consistently out of your depth.</strong> If every conversation about infrastructure makes you uncomfortable, spend two hours learning the basics. You don't need expertise — you need enough literacy to follow the conversation and ask good questions. That's what this course is about.</p>
+<div class="callout">
+<strong>Key principle:</strong> The most dangerous person in a technical room is the one who doesn't know what they don't know. The most valuable nontechnical person is the one who can accurately sense their knowledge boundary and navigate it with honesty, curiosity, and clear goal-setting.
+</div>` }
+  ],
+  scenario: null,
+  quiz: {
+    questions: [
+      {
+        q: "An engineer gives a 3-week estimate. Your manager wants it in 1 week. The best response is:",
+        options: [
+          "Tell the engineer to work faster",
+          "Ask the engineer what scope reduction would make 1 week feasible",
+          "Promise 1 week to the manager and hope for the best",
+          "Find a different engineer"
+        ],
+        correct: 1,
+        explanation: `The productive move is scoping: "What could we ship in one week that delivers the most value?" This respects both the business need and the engineering reality. Promising what can't be delivered helps no one.`
+      }
+    ]
+  }
+},
+
+// ─── MODULE 10 ───
+{
+  id: 10, title: "Putting It All Together", time: "10 min",
+  lessons: [
+    { id: "10.1", title: "How everything connects", body: `
+<p>You now understand the full stack — not as a developer, but as someone who can see how the pieces fit together.</p>
+<p>A user opens their browser (<strong>frontend</strong>). The page loads HTML, CSS, and JavaScript. They click a button, which sends a request through an <strong>API</strong> to the <strong>backend</strong>. The backend checks their <strong>authentication</strong>, verifies their <strong>authorization</strong>, queries the <strong>database</strong>, and returns data. The frontend renders that data in the <strong>interface</strong>. The whole thing runs on <strong>cloud infrastructure</strong> — servers, load balancers, containers — monitored by dashboards that track <strong>uptime</strong> and <strong>performance</strong>. The code was built by a team using <strong>Git</strong>, organized in <strong>sprints</strong>, and deployed through an automated <strong>pipeline</strong>. Some features use <strong>AI models</strong> connected via <strong>MCP</strong> to external tools, with <strong>RAG</strong> for accuracy and <strong>structured output</strong> for reliability. The data flows through <strong>ETL pipelines</strong> into a <strong>warehouse</strong> where analysts build dashboards. <strong>Security</strong> is embedded throughout — encryption, authentication, input validation, access controls. <strong>Privacy</strong> regulations govern what data is collected and how it's stored.</p>
+<p>That paragraph describes almost every modern software product. And you now understand every word of it.</p>
+<div class="callout tip">
+<strong>You did it.</strong> You've built a mental model that covers the entire landscape of modern software. Not as an engineer — as someone who can collaborate with engineers, make informed decisions, and lead with confidence.
+</div>` },
+    { id: "10.2", title: "Where to go from here", body: `
+<p>This course gave you conceptual fluency — the ability to understand, discuss, and make decisions about technology. The next step is <strong>applied fluency</strong> — using what you know in real situations.</p>
+<p>Some concrete next steps: Learn basic SQL. Even a few hours of practice with SELECT, WHERE, JOIN, and GROUP BY will let you query data yourself instead of waiting for reports. Set up a GitHub account and push a project — even a simple HTML file. The act of committing, pushing, and deploying will cement concepts that are currently theoretical. Read your company's postmortem reports if they're available — they're the best education in how systems actually fail. Sit in on a sprint planning session and follow the discussion with your new vocabulary. Ask an engineer to walk you through one pull request — not to review the code, but to understand the process.</p>
+<p>The people who grow the fastest are the ones who can accurately map their own knowledge boundaries and systematically expand them where it matters most. You now have the map. Go explore the territory.</p>
+<div class="callout">
+<strong>One person can carry an idea all the way to reality. Now you know enough about the machinery to do it.</strong>
+</div>` }
+  ],
+  scenario: null,
+  quiz: null
+}
 ];
 
-// ── State ──
-const STORAGE_KEY = 'techfluency_progress';
-let completed = {};
-let currentLesson = null; // { m, l } or null (landing) or 'complete'
+// ═══════════════════════════════════════════════════════
+// APP STATE & PROGRESS
+// ═══════════════════════════════════════════════════════
+
+const STORAGE_KEY = 'techFluencyV2Progress';
 
 function loadProgress() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) completed = JSON.parse(raw);
-  } catch(e) { completed = {}; }
+    const d = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    return d && typeof d === 'object' ? d : { lessons: {}, quizzes: {}, scenarios: {} };
+  } catch { return { lessons: {}, quizzes: {}, scenarios: {} }; }
 }
 
-function saveProgress() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(completed));
+function saveProgress(p) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(p));
 }
 
-function lessonKey(m, l) { return `${m}-${l}`; }
+let progress = loadProgress();
+let currentView = null; // { type: 'landing' | 'lesson' | 'quiz' | 'scenario' | 'completion', moduleId, lessonId }
 
-function isComplete(m, l) { return !!completed[lessonKey(m, l)]; }
+// Build flat lesson list for navigation
+const flatItems = [];
+MODULES.forEach(m => {
+  m.lessons.forEach(l => flatItems.push({ type: 'lesson', moduleId: m.id, lessonId: l.id }));
+  if (m.scenario) flatItems.push({ type: 'scenario', moduleId: m.id });
+  if (m.quiz) flatItems.push({ type: 'quiz', moduleId: m.id });
+});
 
-function toggleComplete(m, l) {
-  const k = lessonKey(m, l);
-  if (completed[k]) delete completed[k];
-  else completed[k] = true;
-  saveProgress();
-  updateProgress();
-  renderSidebar();
-  renderContent();
+function getItemKey(item) {
+  if (item.type === 'lesson') return `lesson-${item.lessonId}`;
+  if (item.type === 'quiz') return `quiz-${item.moduleId}`;
+  if (item.type === 'scenario') return `scenario-${item.moduleId}`;
+  return '';
 }
 
-function totalLessons() {
-  return MODULES.reduce((sum, mod) => sum + mod.lessons.length, 0);
+function isItemComplete(item) {
+  const key = getItemKey(item);
+  if (item.type === 'lesson') return !!progress.lessons[item.lessonId];
+  if (item.type === 'quiz') return !!progress.quizzes[item.moduleId];
+  if (item.type === 'scenario') return !!progress.scenarios[item.moduleId];
+  return false;
 }
 
-function completedCount() {
-  return Object.keys(completed).length;
+function getModuleItems(m) {
+  const items = m.lessons.map(l => ({ type: 'lesson', moduleId: m.id, lessonId: l.id }));
+  if (m.scenario) items.push({ type: 'scenario', moduleId: m.id });
+  if (m.quiz) items.push({ type: 'quiz', moduleId: m.id });
+  return items;
 }
 
-function isModuleComplete(m) {
-  return MODULES[m].lessons.every((_, l) => isComplete(m, l));
+function getModuleProgress(m) {
+  const items = getModuleItems(m);
+  const done = items.filter(i => isItemComplete(i)).length;
+  return { done, total: items.length };
 }
 
-// ── Progress ──
-function updateProgress() {
-  const total = totalLessons();
-  const done = completedCount();
-  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
-  document.getElementById('progressPct').textContent = pct + '%';
-  document.getElementById('topbarPct').textContent = pct + '%';
-  const fill = document.getElementById('progressFill');
-  fill.style.width = pct + '%';
-  fill.classList.toggle('complete', pct === 100);
+function getTotalProgress() {
+  let done = 0, total = 0;
+  MODULES.forEach(m => {
+    const p = getModuleProgress(m);
+    done += p.done;
+    total += p.total;
+  });
+  return { done, total };
 }
 
-// ── Sidebar ──
+// ═══════════════════════════════════════════════════════
+// SIDEBAR RENDERING
+// ═══════════════════════════════════════════════════════
+
 function renderSidebar() {
-  const nav = document.getElementById('sidebarNav');
+  const nav = document.getElementById('sidebar-nav');
   nav.innerHTML = '';
 
-  MODULES.forEach((mod, mi) => {
+  MODULES.forEach(m => {
+    const mp = getModuleProgress(m);
+    const pct = mp.total > 0 ? mp.done / mp.total : 0;
+    const isDone = mp.done === mp.total;
+    const circumference = 2 * Math.PI * 7;
+    const offset = circumference * (1 - pct);
+
     const group = document.createElement('div');
     group.className = 'module-group';
 
-    const header = document.createElement('div');
-    header.className = 'module-header';
+    group.innerHTML = `
+      <div class="module-header" data-module="${m.id}">
+        <svg class="module-progress-ring ${isDone ? 'done' : ''}" width="20" height="20" viewBox="0 0 20 20">
+          <circle class="track" cx="10" cy="10" r="7"/>
+          <circle class="fill" cx="10" cy="10" r="7"
+            stroke-dasharray="${circumference}"
+            stroke-dashoffset="${offset}"/>
+        </svg>
+        <span class="module-title-text">${m.id}. ${m.title}</span>
+        <span class="module-badge ${isDone ? 'show' : ''}">&#9733;</span>
+        <span class="module-time">~${m.time}</span>
+      </div>
+      <div class="module-lessons" data-module-lessons="${m.id}"></div>
+    `;
 
-    const num = document.createElement('span');
-    num.className = 'module-number' + (isModuleComplete(mi) ? ' done' : '');
-    num.textContent = mi + 1;
+    const lessonsContainer = group.querySelector('.module-lessons');
 
-    header.appendChild(num);
-    header.appendChild(document.createTextNode(mod.title));
-    group.appendChild(header);
-
-    mod.lessons.forEach((lesson, li) => {
+    // Lesson buttons
+    m.lessons.forEach(l => {
+      const done = !!progress.lessons[l.id];
+      const isActive = currentView && currentView.type === 'lesson' && currentView.lessonId === l.id;
       const btn = document.createElement('button');
-      btn.className = 'lesson-btn';
-      if (currentLesson && currentLesson.m === mi && currentLesson.l === li) {
-        btn.classList.add('active');
-      }
+      btn.className = `lesson-btn${isActive ? ' active' : ''}`;
+      btn.innerHTML = `
+        <span class="lesson-check ${done ? 'done' : ''}"></span>
+        <span class="lesson-label">${l.id} ${l.title}</span>
+      `;
+      btn.onclick = () => navigateTo({ type: 'lesson', moduleId: m.id, lessonId: l.id });
+      lessonsContainer.appendChild(btn);
+    });
 
-      const check = document.createElement('span');
-      check.className = 'lesson-check' + (isComplete(mi, li) ? ' done' : '');
+    // Scenario button
+    if (m.scenario) {
+      const done = !!progress.scenarios[m.id];
+      const isActive = currentView && currentView.type === 'scenario' && currentView.moduleId === m.id;
+      const btn = document.createElement('button');
+      btn.className = `lesson-btn${isActive ? ' active' : ''}`;
+      btn.innerHTML = `
+        <span class="lesson-check ${done ? 'done' : ''}"></span>
+        <span class="lesson-label"><span class="scenario-icon">&#9670;</span> Scenario</span>
+      `;
+      btn.onclick = () => navigateTo({ type: 'scenario', moduleId: m.id });
+      lessonsContainer.appendChild(btn);
+    }
 
-      const label = document.createElement('span');
-      label.className = 'lesson-label';
-      label.textContent = lesson.title;
+    // Quiz button
+    if (m.quiz) {
+      const done = !!progress.quizzes[m.id];
+      const isActive = currentView && currentView.type === 'quiz' && currentView.moduleId === m.id;
+      const btn = document.createElement('button');
+      btn.className = `lesson-btn${isActive ? ' active' : ''}`;
+      btn.innerHTML = `
+        <span class="lesson-check ${done ? 'done' : ''}"></span>
+        <span class="lesson-label"><span class="quiz-icon">&#9679;</span> Quiz</span>
+      `;
+      btn.onclick = () => navigateTo({ type: 'quiz', moduleId: m.id });
+      lessonsContainer.appendChild(btn);
+    }
 
-      btn.appendChild(check);
-      btn.appendChild(label);
-      btn.addEventListener('click', () => goTo(mi, li));
-      group.appendChild(btn);
+    // Collapse/expand toggle
+    const header = group.querySelector('.module-header');
+    header.addEventListener('click', () => {
+      lessonsContainer.classList.toggle('collapsed');
     });
 
     nav.appendChild(group);
   });
+
+  updateProgressBar();
 }
 
-// ── Content ──
+function updateProgressBar() {
+  const { done, total } = getTotalProgress();
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  const fill = document.getElementById('progress-fill');
+  const label = document.getElementById('progress-pct');
+  const topProg = document.getElementById('topbar-progress');
+
+  fill.style.width = pct + '%';
+  fill.className = 'progress-fill' + (pct === 100 ? ' complete' : '');
+  label.textContent = pct + '%';
+  topProg.textContent = pct + '%';
+}
+
+// ═══════════════════════════════════════════════════════
+// CONTENT RENDERING
+// ═══════════════════════════════════════════════════════
+
+function navigateTo(view) {
+  currentView = view;
+  renderContent();
+  renderSidebar();
+
+  // Close mobile sidebar
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+
+  // Scroll to top
+  document.getElementById('content-scroll').scrollTop = 0;
+}
+
 function renderContent() {
-  const area = document.getElementById('contentArea');
+  const el = document.getElementById('content');
 
-  // Landing page
-  if (currentLesson === null) {
-    const done = completedCount();
-    const total = totalLessons();
-    area.innerHTML = `
-      <div class="landing lesson-content">
-        <div class="landing-icon">&mdash;</div>
-        <h1>Technical Fluency for Non-Engineers</h1>
-        <p>A compact guide for non-engineers who work with software teams.</p>
-        ${done > 0 ? `<p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:24px">${done} of ${total} lessons completed</p>` : ''}
-        <button class="btn-nav primary" onclick="goTo(0,0)">Start learning &rarr;</button>
-      </div>`;
-    requestAnimationFrame(() => {
-      area.querySelector('.lesson-content').classList.add('visible');
-    });
-    return;
+  if (!currentView || currentView.type === 'landing') {
+    renderLanding(el);
+  } else if (currentView.type === 'lesson') {
+    renderLesson(el);
+  } else if (currentView.type === 'quiz') {
+    renderQuiz(el);
+  } else if (currentView.type === 'scenario') {
+    renderScenario(el);
+  } else if (currentView.type === 'completion') {
+    renderCompletion(el);
   }
 
-  // Completion page
-  if (currentLesson === 'complete') {
-    area.innerHTML = `
-      <div class="completion lesson-content">
-        <div class="completion-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <h1>You're fluent.</h1>
-        <p>You now have more technical fluency than 90% of business professionals. Not because you memorized jargon, but because you understand how the pieces fit together &mdash; state, logic, and interface; frontend and backend; version control and deployment; APIs and databases; AI workflows and their limitations; and how to be genuinely useful in technical conversations.</p>
-        <p>The next step isn&rsquo;t to learn more theory. It&rsquo;s to go build something. Use what you now understand to direct, evaluate, and contribute to real technical work. The fluency becomes durable only when it&rsquo;s applied.</p>
-        <p style="color:var(--text-muted);font-size:0.88rem">One person can carry an idea all the way to reality. Now you know enough about the machinery to do it.</p>
-        <button class="btn-nav" onclick="goTo(0,0)">&larr; Review from the beginning</button>
-      </div>`;
-    requestAnimationFrame(() => {
-      area.querySelector('.lesson-content').classList.add('visible');
-    });
-    return;
-  }
-
-  const { m, l } = currentLesson;
-  const mod = MODULES[m];
-  const lesson = mod.lessons[l];
-  const done = isComplete(m, l);
-
-  const hasPrev = m > 0 || l > 0;
-  const isLast = m === MODULES.length - 1 && l === mod.lessons.length - 1;
-
-  area.innerHTML = `
-    <div class="lesson-content">
-      <div class="lesson-module-label">Module ${m + 1}: ${mod.title}</div>
-      <h1 class="lesson-title">${lesson.title}</h1>
-      <div class="lesson-body">${lesson.body}</div>
-      <div class="lesson-actions">
-        <button class="btn-complete ${done ? 'done' : ''}" onclick="toggleComplete(${m},${l})">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            ${done
-              ? '<polyline points="20 6 9 17 4 12"/>'
-              : '<circle cx="12" cy="12" r="10"/>'}
-          </svg>
-          ${done ? 'Completed' : 'Mark complete'}
-        </button>
-        <div class="nav-group">
-          ${hasPrev ? `<button class="btn-nav" onclick="goPrev()">&larr; Previous</button>` : ''}
-          <button class="btn-nav primary" onclick="goNext()">${isLast ? 'Finish' : 'Next'} &rarr;</button>
-        </div>
-      </div>
-    </div>`;
-
+  // Animate in
   requestAnimationFrame(() => {
-    area.querySelector('.lesson-content').classList.add('visible');
+    const lc = el.querySelector('.lesson-content, .landing, .completion');
+    if (lc) requestAnimationFrame(() => lc.classList.add('visible'));
   });
 }
 
-// ── Navigation ──
-function goTo(m, l) {
-  currentLesson = { m, l };
-  renderSidebar();
+function renderLanding(el) {
+  const { done, total } = getTotalProgress();
+  const resumeItem = findFirstIncomplete();
+
+  el.innerHTML = `
+    <div class="lesson-content landing">
+      <div class="landing-icon">&#128218;</div>
+      <h1>Tech Fluency</h1>
+      <p>The complete guide to understanding software, infrastructure, data, AI, and how to work effectively with technical teams. No coding required.</p>
+      <button class="btn-nav primary" onclick="startOrResume()">
+        ${done > 0 ? 'Resume where you left off' : 'Start learning'} →
+      </button>
+      <div class="landing-stats">
+        <span><strong>10</strong> Modules</span>
+        <span><strong>42</strong> Lessons</span>
+        <span><strong>~2.5h</strong> Total</span>
+      </div>
+    </div>
+  `;
+}
+
+function renderLesson(el) {
+  const mod = MODULES.find(m => m.id === currentView.moduleId);
+  const lesson = mod.lessons.find(l => l.id === currentView.lessonId);
+  const isDone = !!progress.lessons[lesson.id];
+  const idx = flatItems.findIndex(i => i.type === 'lesson' && i.lessonId === lesson.id);
+  const prev = idx > 0 ? flatItems[idx - 1] : null;
+  const next = idx < flatItems.length - 1 ? flatItems[idx + 1] : null;
+
+  el.innerHTML = `
+    <div class="lesson-content">
+      <div class="lesson-module-label">Module ${mod.id}: ${mod.title}</div>
+      <h1 class="lesson-title">${lesson.title}</h1>
+      <div class="lesson-body">${lesson.body}</div>
+      <div class="lesson-actions">
+        <button class="btn-complete ${isDone ? 'done' : ''}" onclick="toggleComplete('${lesson.id}')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            ${isDone ? '<path d="M20 6L9 17l-5-5"/>' : '<circle cx="12" cy="12" r="10"/>'}
+          </svg>
+          ${isDone ? 'Completed' : 'Mark complete'}
+        </button>
+        <div class="nav-group">
+          ${prev ? `<button class="btn-nav" onclick='navigateTo(${JSON.stringify(prev)})'>← Prev</button>` : ''}
+          ${next ? `<button class="btn-nav primary" onclick='navigateTo(${JSON.stringify(next)})'>Next →</button>` : `<button class="btn-nav primary" onclick='checkCompletion()'>Finish →</button>`}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderQuiz(el) {
+  const mod = MODULES.find(m => m.id === currentView.moduleId);
+  const quiz = mod.quiz;
+  const isDone = !!progress.quizzes[mod.id];
+  const idx = flatItems.findIndex(i => i.type === 'quiz' && i.moduleId === mod.id);
+  const prev = idx > 0 ? flatItems[idx - 1] : null;
+  const next = idx < flatItems.length - 1 ? flatItems[idx + 1] : null;
+
+  let questionsHtml = quiz.questions.map((q, qi) => {
+    const optHtml = q.options.map((opt, oi) => `
+      <button class="quiz-option" data-q="${qi}" data-o="${oi}">${opt}</button>
+    `).join('');
+    return `
+      <div class="quiz-question" data-qi="${qi}">
+        <p><strong>Q${qi + 1}:</strong> ${q.q}</p>
+        <div class="quiz-options">${optHtml}</div>
+        <div class="quiz-explanation" data-qe="${qi}">${q.explanation}</div>
+      </div>
+    `;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="lesson-content">
+      <div class="lesson-module-label">Module ${mod.id}: ${mod.title}</div>
+      <h1 class="lesson-title">Quiz</h1>
+      <div class="quiz-card">
+        <h3>Test your understanding</h3>
+        ${questionsHtml}
+      </div>
+      <div class="lesson-actions">
+        <button class="btn-complete ${isDone ? 'done' : ''}" id="quiz-complete-btn" onclick="markQuizComplete(${mod.id})" ${isDone ? '' : 'disabled style="opacity:0.4;cursor:default"'}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            ${isDone ? '<path d="M20 6L9 17l-5-5"/>' : '<circle cx="12" cy="12" r="10"/>'}
+          </svg>
+          ${isDone ? 'Completed' : 'Answer all questions'}
+        </button>
+        <div class="nav-group">
+          ${prev ? `<button class="btn-nav" onclick='navigateTo(${JSON.stringify(prev)})'>← Prev</button>` : ''}
+          ${next ? `<button class="btn-nav primary" onclick='navigateTo(${JSON.stringify(next)})'>Next →</button>` : `<button class="btn-nav primary" onclick='checkCompletion()'>Finish →</button>`}
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Wire up quiz option clicks
+  const answeredQs = new Set();
+  el.querySelectorAll('.quiz-option').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const qi = parseInt(btn.dataset.q);
+      if (answeredQs.has(qi)) return;
+      answeredQs.add(qi);
+
+      const correct = quiz.questions[qi].correct;
+      const oi = parseInt(btn.dataset.o);
+      const allOpts = el.querySelectorAll(`.quiz-option[data-q="${qi}"]`);
+
+      allOpts.forEach((o, i) => {
+        if (i === oi && i === correct) {
+          o.classList.add('correct');
+        } else if (i === oi) {
+          o.classList.add('incorrect');
+        } else {
+          o.classList.add('revealed');
+          if (i === correct) o.classList.add('correct');
+        }
+      });
+
+      el.querySelector(`.quiz-explanation[data-qe="${qi}"]`).classList.add('show');
+
+      // Check if all answered
+      if (answeredQs.size === quiz.questions.length) {
+        const btn2 = document.getElementById('quiz-complete-btn');
+        if (btn2 && !progress.quizzes[mod.id]) {
+          markQuizComplete(mod.id);
+        }
+      }
+    });
+  });
+}
+
+function renderScenario(el) {
+  const mod = MODULES.find(m => m.id === currentView.moduleId);
+  const scenario = mod.scenario;
+  const isDone = !!progress.scenarios[mod.id];
+  const idx = flatItems.findIndex(i => i.type === 'scenario' && i.moduleId === mod.id);
+  const prev = idx > 0 ? flatItems[idx - 1] : null;
+  const next = idx < flatItems.length - 1 ? flatItems[idx + 1] : null;
+
+  const optsHtml = scenario.options.map((opt, i) => `
+    <button class="scenario-option" data-so="${i}">${opt.text}</button>
+  `).join('');
+
+  el.innerHTML = `
+    <div class="lesson-content">
+      <div class="lesson-module-label">Module ${mod.id}: ${mod.title}</div>
+      <h1 class="lesson-title">Scenario Exercise</h1>
+      <div class="scenario-card">
+        <h3>Workplace Scenario</h3>
+        <div class="scenario-situation">${scenario.situation}</div>
+        <div class="scenario-prompt">${scenario.prompt}</div>
+        <div class="scenario-options">${optsHtml}</div>
+        <div class="scenario-explanation"><strong>Best approach:</strong> ${scenario.explanation}</div>
+      </div>
+      <div class="lesson-actions">
+        <button class="btn-complete ${isDone ? 'done' : ''}" id="scenario-complete-btn" onclick="markScenarioComplete(${mod.id})" ${isDone ? '' : 'disabled style="opacity:0.4;cursor:default"'}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            ${isDone ? '<path d="M20 6L9 17l-5-5"/>' : '<circle cx="12" cy="12" r="10"/>'}
+          </svg>
+          ${isDone ? 'Completed' : 'Choose an option'}
+        </button>
+        <div class="nav-group">
+          ${prev ? `<button class="btn-nav" onclick='navigateTo(${JSON.stringify(prev)})'>← Prev</button>` : ''}
+          ${next ? `<button class="btn-nav primary" onclick='navigateTo(${JSON.stringify(next)})'>Next →</button>` : `<button class="btn-nav primary" onclick='checkCompletion()'>Finish →</button>`}
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Wire up scenario clicks
+  let answered = false;
+  el.querySelectorAll('.scenario-option').forEach((btn, i) => {
+    btn.addEventListener('click', () => {
+      if (answered) return;
+      answered = true;
+
+      el.querySelectorAll('.scenario-option').forEach((o, j) => {
+        if (j === i) {
+          o.classList.add('selected');
+        } else {
+          o.classList.add('revealed');
+        }
+      });
+
+      el.querySelector('.scenario-explanation').classList.add('show');
+      markScenarioComplete(mod.id);
+    });
+  });
+}
+
+function renderCompletion(el) {
+  el.innerHTML = `
+    <div class="lesson-content completion">
+      <div class="completion-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M20 6L9 17l-5-5"/>
+        </svg>
+      </div>
+      <h1>Course Complete</h1>
+      <p>You've completed Tech Fluency — The Complete Edition. You now have the conceptual vocabulary to understand, discuss, and make decisions about modern software.</p>
+      <p>One person can carry an idea all the way to reality. Now you know enough about the machinery to do it.</p>
+      <button class="btn-nav primary" onclick="navigateTo({type:'landing'})">Back to overview</button>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════
+// ACTIONS
+// ═══════════════════════════════════════════════════════
+
+function toggleComplete(lessonId) {
+  if (progress.lessons[lessonId]) {
+    delete progress.lessons[lessonId];
+  } else {
+    progress.lessons[lessonId] = true;
+  }
+  saveProgress(progress);
   renderContent();
-  closeMobileMenu();
-  document.querySelector('.content-scroll').scrollTop = 0;
+  renderSidebar();
 }
 
-function goNext() {
-  if (currentLesson === null) { goTo(0, 0); return; }
-  if (currentLesson === 'complete') return;
-  const { m, l } = currentLesson;
-  const mod = MODULES[m];
-  if (l < mod.lessons.length - 1) { goTo(m, l + 1); }
-  else if (m < MODULES.length - 1) { goTo(m + 1, 0); }
-  else {
-    currentLesson = 'complete';
-    renderSidebar();
-    renderContent();
+function markQuizComplete(moduleId) {
+  progress.quizzes[moduleId] = true;
+  saveProgress(progress);
+  renderSidebar();
+  const btn = document.getElementById('quiz-complete-btn');
+  if (btn) {
+    btn.classList.add('done');
+    btn.removeAttribute('disabled');
+    btn.style.opacity = '';
+    btn.style.cursor = '';
+    btn.innerHTML = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M20 6L9 17l-5-5"/>
+      </svg>
+      Completed
+    `;
   }
 }
 
-function goPrev() {
-  if (!currentLesson || currentLesson === 'complete') return;
-  const { m, l } = currentLesson;
-  if (l > 0) goTo(m, l - 1);
-  else if (m > 0) {
-    const prevMod = MODULES[m - 1];
-    goTo(m - 1, prevMod.lessons.length - 1);
+function markScenarioComplete(moduleId) {
+  progress.scenarios[moduleId] = true;
+  saveProgress(progress);
+  renderSidebar();
+  const btn = document.getElementById('scenario-complete-btn');
+  if (btn) {
+    btn.classList.add('done');
+    btn.removeAttribute('disabled');
+    btn.style.opacity = '';
+    btn.style.cursor = '';
+    btn.innerHTML = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M20 6L9 17l-5-5"/>
+      </svg>
+      Completed
+    `;
   }
 }
 
-// ── Mobile menu ──
-function closeMobileMenu() {
+function findFirstIncomplete() {
+  return flatItems.find(i => !isItemComplete(i)) || null;
+}
+
+function startOrResume() {
+  const item = findFirstIncomplete();
+  if (item) {
+    navigateTo(item);
+  } else {
+    navigateTo({ type: 'completion' });
+  }
+}
+
+function checkCompletion() {
+  const { done, total } = getTotalProgress();
+  if (done === total) {
+    navigateTo({ type: 'completion' });
+  } else {
+    startOrResume();
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// MOBILE NAV
+// ═══════════════════════════════════════════════════════
+
+document.getElementById('hamburger').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('overlay').classList.add('show');
+});
+
+document.getElementById('overlay').addEventListener('click', () => {
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('overlay').classList.remove('show');
-}
-
-document.getElementById('hamburgerBtn').addEventListener('click', () => {
-  document.getElementById('sidebar').classList.toggle('open');
-  document.getElementById('overlay').classList.toggle('show');
 });
 
-document.getElementById('overlay').addEventListener('click', closeMobileMenu);
-
-// ── Keyboard shortcuts ──
+// Keyboard nav
 document.addEventListener('keydown', (e) => {
-  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-  if (e.key === 'ArrowRight' || e.key === 'j') goNext();
-  if (e.key === 'ArrowLeft' || e.key === 'k') goPrev();
-  if (e.key === ' ' && currentLesson && currentLesson !== 'complete') {
-    e.preventDefault();
-    toggleComplete(currentLesson.m, currentLesson.l);
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+    if (!currentView || currentView.type === 'landing' || currentView.type === 'completion') return;
+    const idx = flatItems.findIndex(i => {
+      if (currentView.type === 'lesson') return i.type === 'lesson' && i.lessonId === currentView.lessonId;
+      if (currentView.type === 'quiz') return i.type === 'quiz' && i.moduleId === currentView.moduleId;
+      if (currentView.type === 'scenario') return i.type === 'scenario' && i.moduleId === currentView.moduleId;
+      return false;
+    });
+    if (idx === -1) return;
+    if (e.key === 'ArrowLeft' && idx > 0) navigateTo(flatItems[idx - 1]);
+    if (e.key === 'ArrowRight' && idx < flatItems.length - 1) navigateTo(flatItems[idx + 1]);
   }
 });
 
-// ── Init ──
-loadProgress();
-updateProgress();
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+
 renderSidebar();
-renderContent();
+navigateTo({ type: 'landing' });
+
 </script>
 </body>
 </html>
