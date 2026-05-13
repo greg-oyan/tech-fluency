@@ -1186,116 +1186,9 @@ const MODULES = [
 
 // ─── MODULE 5 ───
 {
-  id: 5, title: "Inside AI Agents", time: "18 min",
+  id: 5, title: "Cloud & Infrastructure", time: "15 min",
   lessons: [
-    { id: "5.1", title: "What people mean when they say 'agent'", body: `
-<p>The word "agent" is one of the most abused terms in tech. There's a real technical distinction, but it gets flattened in marketing. The clean definition: an <strong>agent</strong> is an LLM in a loop that uses tools and decides for itself when it's done. Control flow is determined by the model, not pre-scripted by you. That gives a three-tier taxonomy worth holding onto.</p>
-<p>A <strong>context wrapper</strong> (Custom GPTs, Google Gems, Claude Projects, OpenAI Assistants) is a system prompt plus some files and maybe a tool toggle. Not an agent. The user types something, the model responds, conversation continues turn-by-turn. No autonomous loop. Most "AI features" people build at this tier are basically project folders.</p>
-<p>A <strong>workflow</strong> is when you chain LLM calls together with predetermined logic. "Take the email → classify it → if urgent, draft reply → route to human for approval." You wrote the steps; the LLM fills in content at each node. Most "AI features" shipped in products today are workflows, even when marketed as agents.</p>
-<p>A <strong>true agent</strong> is when the LLM decides what to do next, calls a tool, looks at the result, decides what to do next, and keeps going until it judges the task complete. You give it a goal and a toolkit. It picks the path. Claude Code is the cleanest current example — you say "fix the bug in this function," and the model decides which files to read, which commands to run, when to stop.</p>
-<div class="callout">
-<strong>Key principle:</strong> Agency is a spectrum, not a checkbox. When someone says "we built an AI agent," ask which tier they actually mean. 90% of the time in corporate settings, they mean workflow and don't know the difference.
-</div>` },
-    { id: "5.2", title: "The three layers: brain, menu, hands", body: `
-<p>Every real agent stacks three layers. The <strong>brain</strong> is the LLM. The <strong>menu</strong> is the list of tool descriptions the model reads at inference time. The <strong>hands</strong> are the actual code that runs when the model decides to call a tool. Confusing these three is the most common vocabulary mistake among people who haven't built one.</p>
-<p>The <strong>brain</strong> decides. It reads the user's query, the available tool descriptions, and any prior context, and either answers directly or emits a structured tool call — usually a JSON blob saying "call tool X with these parameters." It does not, itself, do anything in the world. It produces text. The text gets interpreted by other code.</p>
-<p>The <strong>menu</strong> — tool descriptions — is what the model reads to decide which tool to use. Each tool has a name, a plain-English description of what it does, and a parameter schema. The brain only invokes a tool if its description matches the user's intent. This means writing good tool descriptions <em>is</em> agent engineering. A poorly described tool is a tool the model won't invoke at the right time, even though the code works fine.</p>
-<p>The <strong>hands</strong> — tool implementations — are real executable code. HTTP requests, file operations, database queries, shell commands. When the brain emits a tool call, a runtime parses it, executes the matching function, and feeds the result back into the brain's context for the next decision. The brain is rented from a model provider; the menu and hands are what you build.</p>
-<div class="callout">
-<strong>Key principle:</strong> A tool is real code. A tool description is the prompt about the code. The agent is the system. Using these words interchangeably is the tell that someone hasn't actually built one.
-</div>` },
-    { id: "5.3", title: "The agent loop", body: `
-<p>The three layers run together in a loop. The brain receives a query, decides whether to answer directly or invoke a tool, the tool runs, the result feeds back into context, and the brain decides again — until it judges the task complete and emits a final answer. This loop is what makes an agent <em>agentic</em>. A system that calls the LLM once and stops is not an agent. A system that loops, with the model controlling continuation, is.</p>
-<p>The decision to exit the loop is the model's, not the developer's. This is the key difference from a workflow. In a workflow, the developer wrote the steps; the LLM fills in content at each step; control flow is determined by the developer's logic. In an agent, the model is choosing the next action at every iteration. The developer provides tools and a goal; the model navigates.</p>
-<svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:480px;height:auto;display:block;margin:18px auto;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:12px" aria-label="Agent loop diagram">
-  <defs>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="var(--text-secondary)"/>
-    </marker>
-  </defs>
-  <rect x="20" y="90" width="80" height="40" rx="6" fill="none" stroke="var(--border-light)" stroke-width="1.5"/>
-  <text x="60" y="115" text-anchor="middle" fill="var(--text-secondary)" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12">Query</text>
-  <line x1="100" y1="110" x2="155" y2="110" stroke="var(--text-secondary)" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <rect x="160" y="85" width="100" height="50" rx="8" fill="none" stroke="var(--accent)" stroke-width="2"/>
-  <text x="210" y="115" text-anchor="middle" fill="var(--text)" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="600">Decide</text>
-  <line x1="260" y1="100" x2="320" y2="60" stroke="var(--text-secondary)" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <rect x="320" y="40" width="120" height="40" rx="6" fill="none" stroke="var(--border-light)" stroke-width="1.5"/>
-  <text x="380" y="65" text-anchor="middle" fill="var(--text)" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12">Tool runs</text>
-  <line x1="380" y1="80" x2="380" y2="135" stroke="var(--text-secondary)" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <rect x="320" y="140" width="120" height="40" rx="6" fill="none" stroke="var(--border-light)" stroke-width="1.5"/>
-  <text x="380" y="165" text-anchor="middle" fill="var(--text)" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12">Observe result</text>
-  <line x1="320" y1="160" x2="260" y2="120" stroke="var(--text-secondary)" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <line x1="210" y1="85" x2="210" y2="35" stroke="var(--text-secondary)" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrow)"/>
-  <text x="218" y="55" fill="var(--text-muted)" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10" font-style="italic">when done</text>
-  <rect x="20" y="10" width="120" height="40" rx="6" fill="none" stroke="var(--border-light)" stroke-width="1.5"/>
-  <text x="80" y="35" text-anchor="middle" fill="var(--text-secondary)" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12">Final answer</text>
-  <line x1="195" y1="35" x2="145" y2="35" stroke="var(--text-secondary)" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrow)"/>
-</svg>
-<p>In practice, this loop can run anywhere from one iteration (model decides no tool is needed, answers directly) to dozens of iterations (model researches, plans, executes, verifies, corrects). The longer the loop runs unattended, the more "agentic" the system is. Claude Code routinely runs loops with twenty or more tool calls before returning to the user. A customer service agent might take five. A simple Q&A bot takes one or zero.</p>
-<div class="callout">
-<strong>Key principle:</strong> The loop is the agent. Without the loop, you have a workflow. The model decides when to exit. That decision — exit or continue — is the part most teams under-engineer.
-</div>` },
-    { id: "5.4", title: "Tool routing and how agents fail", body: `
-<p>The hardest decision the brain makes is <strong>tool routing</strong> — given a query, which tool (if any) to invoke. This decision is driven entirely by the tool descriptions you wrote, the system prompt, and the model's training on structured outputs. Routing is also the most common place agents fail in production. Specifically: the model answers from its own training data when it should have called a tool.</p>
-<p>This failure pattern is called <strong>tool avoidance</strong>. It's especially common in small local models (8B–14B parameters) used in air-gapped enterprise deployments, because small models have stronger biases toward generating from their own weights. Ask a small model "who won the last Super Bowl" with web_search available, and it will often answer from its training data — confidently and wrongly. The tool was there. The brain didn't use it.</p>
-<p>The fix is <strong>grounding</strong> — tying the model's output to verified external information through tool calls instead of letting it generate from memory. You achieve this through better tool descriptions, sharper system prompts, and iteration. "Use web_search for any question about current events, scores, prices, or current people in roles" is a stronger description than "Search the web." Specificity in the menu drives correct routing in the brain.</p>
-<p>You surface these failures with <strong>eval probes</strong> — small batteries of test queries with known-correct answers that target the failure mode you're trying to catch. Two questions that work especially well for tool avoidance: "Who is the current president?" and "Who won the last Super Bowl?" — both have answers the model's training data is guaranteed to be stale on, so a correctly routing agent will hit web_search, and an avoiding agent will confabulate. Iterate until the probes pass. This is real eval-driven development.</p>
-<div class="callout">
-<strong>Key principle:</strong> Tool routing is where agents fail. Probe questions surface the failure. Iterating on tool descriptions and system prompts is how you fix it. This loop — probe, observe, iterate — is the unglamorous core of production agent engineering.
-</div>` },
-    { id: "5.5", title: "Vocabulary lock-in", body: `
-<p>Using the right words matters because vocabulary is how technical people screen for whether you've actually built something or just talked about it. "Agent" used loosely means nothing. "Tool routing failure on time-sensitive queries" used precisely means you've debugged one. The terms in this lesson are the difference between sounding like a tourist and sounding like someone who has shipped.</p>
-<p><strong>Tool, tool description, tool-calling protocol</strong> — three different things, often confused. The <em>tool</em> is the real code (the function that searches the web). The <em>tool description</em> is the JSON or plain-English schema you pass to the model so it knows the tool exists. The <em>tool-calling protocol</em> is the mechanism by which the model emits structured tool calls — OpenAI's function calling, Anthropic's tool use, and MCP (Model Context Protocol) are all protocols. Tools are capabilities; descriptions are prompts; protocols are wire formats.</p>
-<p><strong>MCP</strong> (Model Context Protocol) is the open standard for exposing tools to LLMs across vendors. If your tools are MCP-compatible, the same tools can be used by Claude, GPT, and other compliant models. <strong>Foundry</strong> is a manufacturing metaphor for industrial-grade build platforms — Azure AI Foundry, Palantir Foundry, Pivotal Cloud Foundry. The word signals "this is where production systems get cast," not "this is a sandbox." <strong>Autonomous system</strong> is the classical engineering term that "AI agent" maps to — a system that perceives, decides, and acts toward a goal without step-by-step human direction.</p>
-<p><strong>Frontier vs small models</strong> matters more than most people realize. Frontier models (Claude Opus, GPT-5, Gemini Pro) handle tool calling reliably out of the box. Small models (8B–14B parameters, Ollama-hosted, used in air-gapped environments) struggle with it. The gap between frontier and small models on tool-use accuracy is one of the largest capability differences in the industry. This is why enterprise agents in walled gardens — where you can't reach a frontier API — require dramatically more prompt engineering and eval work than consumer-facing agents that can hit GPT or Claude directly.</p>
-<div class="callout">
-<strong>Key principle:</strong> Vocabulary discipline is professional discipline. Using "tool" when you mean "integration," or "agent" when you mean "workflow," or "MCP" when you mean "function calling" makes you sound like a tourist. Using the right word makes you sound like someone who has built one.
-</div>` }
-  ],
-  scenario: {
-    situation: `A senior leader asks you to "build an AI agent" for the team's repetitive project management work — drafting weekly status updates, summarizing meeting notes, and flagging overdue tasks. The team has access to OpenAI's API. The company's data lives in SharePoint and Microsoft Teams. Budget is approved. They want a demo in three weeks.`,
-    prompt: "What's the first move?",
-    options: [
-      { text: "Start building an autonomous LLM-in-a-loop system with tool calls into SharePoint and Teams", id: "a" },
-      { text: "Clarify whether the leader wants a true agent (autonomous, harder to govern, more capable) or a workflow (you script the steps, the LLM fills in content, ships faster, easier to audit) — and confirm whether the company permits sending internal data to OpenAI's API", id: "b", correct: true },
-      { text: "Decline because public sector data sovereignty rules don't allow it", id: "c" },
-      { text: "Buy a vendor product instead of building anything internally", id: "d" }
-    ],
-    explanation: `90% of "build an AI agent" requests in corporate settings are actually workflow requests, and the requester doesn't know the difference. Clarifying the tier before scoping matters because the engineering, eval, and governance investments are wildly different. The second part — checking data permissions before designing the system — is the table-stakes enterprise question. The leader said "OpenAI's API," but you don't know yet if compliance has approved sending internal data there. Anyone who can ask both questions cleanly is doing real product work, not just demo-driven development.`
-  },
-  quiz: {
-    questions: [
-      {
-        q: `A vendor pitches you their "AI agent" for invoice processing. In the demo, it reads an invoice, extracts fields, checks them against a database, and routes for approval. When you ask how the system handles unusual edge cases, the vendor says "the workflow handles it." What did the vendor just reveal?`,
-        options: [
-          "It's a fully autonomous AI agent",
-          "It's a workflow with LLM components — the word \"agent\" was marketing language",
-          "It's a context wrapper around a chatbot",
-          "It's a retrieval-augmented generation system"
-        ],
-        correct: 1,
-        explanation: `The vendor's own language gave it away — they called it a workflow. The system has predetermined steps with LLM calls inside them. That's a workflow, not an autonomous agent. Both are useful, and workflows are often the right choice — but they have very different engineering, eval, and operational profiles. Spotting the giveaway language is a real professional skill in vendor conversations.`
-      },
-      {
-        q: `A small open-source model in your air-gapped agent is given a web_search tool. When asked "Who is the current president?", it answers from its 2023 training data — confidently and wrongly. What is this failure called, and what's the fix?`,
-        options: [
-          "Hallucination — fix it by switching to a larger model",
-          "Tool avoidance — fix it by iterating on the tool description and system prompt until the model reliably routes time-sensitive queries to web_search",
-          "Latency timeout — fix it by giving the tool more time to respond",
-          "Context overflow — fix it by reducing the input size"
-        ],
-        correct: 1,
-        explanation: `This specific failure — model answers from parametric memory instead of invoking an available tool — is called tool avoidance. It's especially common in small models because they have stronger biases toward generating from their own training data. The fix is prompt engineering on the tool description and the system prompt, plus eval probes (queries with known-current answers) to surface the failure reliably during iteration. Switching to a larger model also fixes it but isn't an option in air-gapped environments.`
-      }
-    ]
-  }
-},
-
-// ─── MODULE 6 ───
-{
-  id: 6, title: "Cloud & Infrastructure", time: "15 min",
-  lessons: [
-    { id: "6.1", title: "What 'the cloud' actually means", body: `
+    { id: "5.1", title: "What 'the cloud' actually means", body: `
 <p>"The cloud" is not a place. It's someone else's computers. When a company says "we're moving to the cloud," they mean they're moving from running software on physical servers they own to running it on servers owned and managed by Amazon (AWS), Microsoft (Azure), or Google (GCP).</p>
 <p>Before the cloud, if you wanted to launch a web application, you had to buy physical servers, put them in a data center, wire up the networking, install the operating system, configure the software, and hire people to maintain everything. If your app got popular and you needed more capacity, you'd order more servers, wait weeks for delivery, set them up, and hope you didn't run out of capacity in the meantime. If your app flopped, you had a closet full of expensive hardware collecting dust.</p>
 <p>Cloud computing eliminated this. With AWS, you can spin up a new server in 60 seconds, use it for an hour, and pay a few cents. Need 100 servers for a big product launch? Click a button. Need to scale back down when traffic normalizes? Click another button. This <strong>elasticity</strong> — the ability to scale resources up and down on demand — is the fundamental value proposition of the cloud.</p>
@@ -1303,7 +1196,7 @@ const MODULES = [
 <div class="callout">
 <strong>Key principle:</strong> "The cloud" is rented infrastructure. It replaced the need to own and maintain physical servers with a pay-as-you-go model that scales on demand. When someone mentions AWS, Azure, or GCP, they're talking about where the software runs and the building blocks it's composed of.
 </div>` },
-    { id: "6.2", title: "Servers, containers, and serverless", body: `
+    { id: "5.2", title: "Servers, containers, and serverless", body: `
 <p>A <strong>server</strong> is just a computer that runs software and responds to requests. When 1,000 people visit your website simultaneously, a server (or group of servers) handles all those requests. But how software runs on those servers has evolved dramatically.</p>
 <p><strong>Virtual machines (VMs)</strong> were the first big innovation. Instead of one application per physical server, you could run multiple isolated "virtual" computers on a single physical machine. Each VM has its own operating system and behaves like a separate computer. This was more efficient but still heavy — each VM consumes significant resources just for its operating system.</p>
 <p><strong>Containers</strong> (Docker is the dominant tool) are a lighter alternative. A container packages an application with everything it needs to run — code, libraries, settings — without needing its own operating system. Containers share the host machine's operating system, making them much faster to start and more efficient with resources. When a developer says "it's containerized" or "it runs in Docker," they mean the application is packaged in a portable, self-contained unit that runs the same way everywhere.</p>
@@ -1312,7 +1205,7 @@ const MODULES = [
 <div class="callout">
 <strong>Key principle:</strong> The evolution went from physical servers → virtual machines → containers → serverless. Each step traded control for convenience. Understanding where your company's software sits on this spectrum tells you a lot about their infrastructure maturity and operational costs.
 </div>` },
-    { id: "6.3", title: "Scaling — why 'just add more servers' isn't simple", body: `
+    { id: "5.3", title: "Scaling — why 'just add more servers' isn't simple", body: `
 <p>When an app gets popular, it needs to handle more users, more data, and more requests. This is called <strong>scaling</strong>, and it's where simple things become hard.</p>
 <p><strong>Vertical scaling</strong> means making a single server bigger — more CPU, more memory, more storage. It's simple but has limits. You can't make one machine infinitely powerful, and bigger machines get disproportionately expensive.</p>
 <p><strong>Horizontal scaling</strong> means adding more servers and distributing the work across them. This is more powerful but vastly more complex. Now you have to answer questions like: how do you distribute requests across multiple servers (load balancing)? If a user's data is on server A, what happens when their next request goes to server B (session management)? How do you keep the databases in sync across servers (replication)? What happens when one server fails (fault tolerance)?</p>
@@ -1321,7 +1214,7 @@ const MODULES = [
 <div class="callout">
 <strong>Key principle:</strong> Scaling is where engineering meets economics. Every scaling decision is a trade-off between performance, complexity, reliability, and cost. When an engineering team says "we need to rethink our architecture to support growth," this is what they mean.
 </div>` },
-    { id: "6.4", title: "Monitoring, uptime, and why things break", body: `
+    { id: "5.4", title: "Monitoring, uptime, and why things break", body: `
 <p>Production systems fail. The question isn't if but when and how badly. What separates good engineering teams from bad ones isn't preventing all failures — it's detecting them fast, understanding them quickly, and recovering gracefully.</p>
 <p><strong>Monitoring</strong> is the practice of collecting data about how your systems are performing in real time. CPU usage, memory consumption, response times, error rates, database query speeds, queue lengths — all of this is continuously measured and displayed in dashboards (tools like Datadog, Grafana, New Relic). When a metric crosses a threshold — say, error rate exceeds 1% — an <strong>alert</strong> fires, paging the on-call engineer.</p>
 <p><strong>Uptime</strong> is measured in "nines." 99% uptime sounds great until you do the math: that's 3.65 days of downtime per year. 99.9% (three nines) is 8.7 hours per year. 99.99% (four nines) is 52 minutes per year. 99.999% (five nines) is 5 minutes per year. Each additional nine is exponentially harder and more expensive to achieve.</p>
@@ -1359,11 +1252,11 @@ const MODULES = [
   }
 },
 
-// ─── MODULE 7 ───
+// ─── MODULE 6 ───
 {
-  id: 7, title: "Security & Privacy", time: "12 min",
+  id: 6, title: "Security & Privacy", time: "12 min",
   lessons: [
-    { id: "7.1", title: "Authentication vs authorization", body: `
+    { id: "6.1", title: "Authentication vs authorization", body: `
 <p>These two words sound similar but mean completely different things, and confusing them is one of the most common mistakes in both conversations and code.</p>
 <p><strong>Authentication</strong> is proving who you are. When you enter your username and password, you're authenticating — proving to the system that you are who you claim to be. Multi-factor authentication (MFA) adds a second proof: something you know (password) plus something you have (phone) or something you are (fingerprint). OAuth (the "Sign in with Google" button) is an authentication protocol that lets you prove your identity through a trusted third party rather than creating a new password.</p>
 <p><strong>Authorization</strong> is determining what you're allowed to do. After the system knows who you are (authentication), it checks what permissions you have (authorization). You might be authenticated as an employee but not authorized to view payroll data. You might be authorized to read a document but not to edit it.</p>
@@ -1372,7 +1265,7 @@ const MODULES = [
 <div class="callout">
 <strong>Key principle:</strong> Authentication = who are you? Authorization = what can you do? They're separate systems and getting either wrong can be catastrophic.
 </div>` },
-    { id: "7.2", title: "Common vulnerabilities in plain English", body: `
+    { id: "6.2", title: "Common vulnerabilities in plain English", body: `
 <p>You don't need to be a security expert, but knowing the most common attack types makes you a better decision-maker.</p>
 <p><strong>SQL injection</strong> is when an attacker inserts malicious database commands through an input field. If a login form naively puts your username directly into a SQL query, an attacker can type something that changes the query itself — potentially accessing, modifying, or deleting the entire database. This is one of the oldest and most common web attacks, and the fix (parameterized queries) is well-known but still frequently forgotten.</p>
 <p><strong>Cross-site scripting (XSS)</strong> is when an attacker injects malicious JavaScript into a web page that other users see. If a comment section doesn't properly sanitize input, an attacker could post a "comment" that's actually a script that steals other users' session cookies when they view the page. The fix is sanitizing all user input — treating everything a user types as potentially dangerous.</p>
@@ -1381,7 +1274,7 @@ const MODULES = [
 <div class="callout">
 <strong>Key principle:</strong> Security is not a feature you add at the end. It's a practice embedded in every line of code, every architectural decision, and every user interaction. The most common attacks exploit predictable, well-known vulnerabilities that simply weren't addressed.
 </div>` },
-    { id: "7.3", title: "Privacy, compliance, and why engineers care", body: `
+    { id: "6.3", title: "Privacy, compliance, and why engineers care", body: `
 <p>Privacy regulations like <strong>GDPR</strong> (Europe), <strong>CCPA</strong> (California), and others aren't just legal requirements — they directly shape how software is built.</p>
 <p>GDPR, for example, gives users the "right to be forgotten" — they can demand that a company delete all their personal data. This sounds simple until you realize that user data might be scattered across 15 different databases, cached in multiple systems, embedded in log files, replicated across backup systems, and referenced in analytics pipelines. Building a "delete my data" feature that actually deletes data everywhere is a significant engineering challenge.</p>
 <p><strong>Data minimization</strong> — collecting only the data you actually need — is both a legal principle and a technical one. Every piece of data you store is a piece of data you have to secure, maintain, and potentially delete. The safest data is data you never collected in the first place.</p>
@@ -1408,11 +1301,11 @@ const MODULES = [
   }
 },
 
-// ─── MODULE 8 ───
+// ─── MODULE 7 ───
 {
-  id: 8, title: "Product Management & Agile", time: "15 min",
+  id: 7, title: "Product Management & Agile", time: "15 min",
   lessons: [
-    { id: "8.1", title: "Agile, sprints, and how teams actually work", body: `
+    { id: "7.1", title: "Agile, sprints, and how teams actually work", body: `
 <p><strong>Agile</strong> is a philosophy for building software: instead of planning everything upfront and delivering one big release, build in small increments, get feedback, and adjust. The most popular implementation is <strong>Scrum</strong>, which structures work into <strong>sprints</strong> — usually two-week cycles.</p>
 <p>Each sprint follows a rhythm. It starts with <strong>sprint planning</strong>, where the team selects items from the <strong>backlog</strong> (a prioritized list of all work to be done) and commits to completing them. During the sprint, the team works on those items. Each day starts with a <strong>standup</strong> — a brief meeting (ideally 15 minutes) where everyone shares what they did yesterday, what they're doing today, and if anything is blocking them. At the end, there's a <strong>sprint review</strong> (demo what was built) and a <strong>retrospective</strong> (discuss what went well and what to improve).</p>
 <p><strong>Story points</strong> are how teams estimate work. Instead of hours or days, they use abstract units that represent complexity and effort. A simple bug fix might be 1 point. A new feature with database changes, API updates, and frontend work might be 8 points. The abstraction sounds weird but it works — it separates "how long will this take" from "how hard is this," which are different questions. Over time, teams develop a <strong>velocity</strong> — the average number of points they complete per sprint — which becomes a reliable planning tool.</p>
@@ -1420,14 +1313,14 @@ const MODULES = [
 <div class="callout">
 <strong>Key principle:</strong> Agile isn't a rigid process — it's a set of principles about iteration, feedback, and adaptation. The specific implementation (Scrum, Kanban, or a hybrid) matters less than the underlying discipline of shipping small increments and learning from them.
 </div>` },
-    { id: "8.2", title: "Roadmaps, backlogs, and prioritization", body: `
+    { id: "7.2", title: "Roadmaps, backlogs, and prioritization", body: `
 <p>A <strong>roadmap</strong> is a strategic plan for where a product is going. It's not a promise — it's a direction. Good roadmaps communicate themes and priorities ("Q2 is about improving onboarding, Q3 is about enterprise features") rather than specific feature commitments with hard dates. The moment a roadmap becomes a list of features with deadlines, it becomes a fiction that everyone pretends to believe.</p>
 <p>The <strong>backlog</strong> is where all the work lives — feature ideas, bug reports, technical debt items, research spikes. A healthy backlog is prioritized ruthlessly. The top items are well-defined and ready to work on. The bottom items might never get done, and that's fine. An overstuffed backlog where everything is "high priority" is the same as nothing being prioritized.</p>
 <p>Prioritization frameworks help teams make decisions systematically. <strong>RICE</strong> (Reach × Impact × Confidence / Effort) scores each item by how many users it affects, how much it matters, how confident you are in those estimates, and how much effort it requires. <strong>MoSCoW</strong> (Must have, Should have, Could have, Won't have) is simpler — it forces you to put items into buckets. The specific framework matters less than having a disciplined process that prevents the loudest stakeholder from always winning.</p>
 <div class="callout">
 <strong>Key principle:</strong> The most important product skill isn't adding things to the roadmap — it's removing them. Every feature you say yes to is a feature that takes time away from something else. The best PMs are the ones who can say "not now" and explain why convincingly.
 </div>` },
-    { id: "8.3", title: "User stories, acceptance criteria, and 'definition of done'", body: `
+    { id: "7.3", title: "User stories, acceptance criteria, and 'definition of done'", body: `
 <p>A <strong>user story</strong> is a description of a feature from the user's perspective: "As a [type of user], I want [something] so that [reason]." For example: "As a team manager, I want to export my team's timesheet data as a CSV so that I can submit it to payroll." The format forces you to think about who needs it, what they need, and why.</p>
 <p><strong>Acceptance criteria</strong> define what "done" means for a user story. They're the checklist that determines whether the implementation actually satisfies the requirement. For the timesheet export: "The export includes all team members. Dates default to the current pay period. The CSV opens correctly in Excel. If there are no entries, the export shows headers with no data rows rather than failing."</p>
 <p>Without clear acceptance criteria, "done" is subjective. The developer thinks it's done when the export button works. The PM thinks it's done when it handles all edge cases. The designer thinks it's done when it matches the mockups. This misalignment causes rework, frustration, and shipped features that technically work but don't actually solve the user's problem.</p>
@@ -1435,7 +1328,7 @@ const MODULES = [
 <div class="callout">
 <strong>Key principle:</strong> Vague requirements produce vague results. The time spent writing clear user stories and acceptance criteria before development starts pays for itself many times over in reduced rework and miscommunication.
 </div>` },
-    { id: "8.4", title: "The PM-engineering relationship", body: `
+    { id: "7.4", title: "The PM-engineering relationship", body: `
 <p>The relationship between product managers and engineers is one of the most important dynamics in any software organization, and also one of the most fraught.</p>
 <p>The PM's job is to decide <strong>what</strong> to build and <strong>why</strong>. The engineer's job is to decide <strong>how</strong> to build it and to flag when the "what" is infeasible, dangerous, or more complex than it appears. When this boundary is respected, the relationship is productive. When it's violated — PMs dictating technical implementation, engineers ignoring business requirements — everything breaks down.</p>
 <p>The best PMs bring engineers into the "why" early. Instead of handing over a fully-specified feature requirement, they share the problem they're trying to solve and ask for input on possible solutions. Engineers often see options that PMs don't, and they can flag technical constraints that fundamentally reshape the approach. The worst PMs treat engineers as order-takers — "build exactly this" — and then are surprised when the result doesn't solve the actual problem.</p>
@@ -1472,11 +1365,11 @@ const MODULES = [
   }
 },
 
-// ─── MODULE 9 ───
+// ─── MODULE 8 ───
 {
-  id: 9, title: "AI Products Are Still Software", time: "20 min",
+  id: 8, title: "AI Products Are Still Software", time: "20 min",
   lessons: [
-    { id: "9.1", title: "AI is workflows around probabilistic models", body: `
+    { id: "8.1", title: "AI is workflows around probabilistic models", body: `
 <p>Here's the single most important mental model for understanding AI products: <strong>AI is not magic — it's software with a probabilistic component.</strong> A traditional app has deterministic logic: the same input always produces the same output. An AI app has a model at its core that produces <em>probable</em> outputs — the same input might produce slightly different results each time, and some of those results might be wrong.</p>
 <p>This is a fundamental shift. In traditional software, a bug means the code is doing something wrong. In AI software, the model might be doing exactly what it's designed to do and still produce an incorrect result. A language model generates the most statistically likely next token — that's its job. If the statistically likely response happens to be factually wrong (a "hallucination"), the model isn't broken. It's working as intended in a way that produces an undesirable outcome.</p>
 <p>Every AI product you've used is mostly <em>non-AI software</em> surrounding a model. ChatGPT is a web application (frontend, backend, databases, authentication, billing) with a language model in the middle. The model generates text. Everything else — the chat interface, conversation history, file uploads, tool usage, safety filters, rate limiting — is traditional software engineering.</p>
@@ -1484,7 +1377,7 @@ const MODULES = [
 <div class="callout">
 <strong>Key principle:</strong> AI products = traditional software engineering + a probabilistic model + the workflows needed to make that model useful and reliable. The AI part is often less than 20% of the total work. The other 80% is everything we've covered in this course.
 </div>` },
-    { id: "9.2", title: "Prompting vs workflows vs agents", body: `
+    { id: "8.2", title: "Prompting vs workflows vs agents", body: `
 <p>These three concepts represent increasing levels of sophistication in how AI is used, and understanding the spectrum helps you evaluate AI product claims.</p>
 <p><strong>Prompting</strong> is the simplest: you write a text instruction and send it to a model. "Summarize this document." "Translate this to Spanish." "Write a marketing email for our new product." One input, one output. This is how most people interact with AI today.</p>
 <p><strong>Workflows</strong> are multi-step processes where the output of one AI call feeds into the next, often with traditional code in between. Example: extract key facts from a document (AI call #1) → look up those facts in a database (code) → generate a report comparing the facts to historical data (AI call #2) → format the report as a PDF (code). Workflows are where AI gets genuinely powerful because you're combining the model's capabilities with structured data and logic.</p>
@@ -1493,7 +1386,7 @@ const MODULES = [
 <div class="callout">
 <strong>Key principle:</strong> Prompting is a single turn. Workflows are multi-step with logic in between. Agents make their own decisions. Each level is more powerful and more fragile. Most real production AI is workflows, not agents.
 </div>` },
-    { id: "9.3", title: "MCPs — the Model Context Protocol", body: `
+    { id: "8.3", title: "MCPs — the Model Context Protocol", body: `
 <p><strong>MCP</strong> (Model Context Protocol) is an open standard that solves a specific problem: how do AI models connect to external tools and data sources in a consistent, reusable way?</p>
 <p>Before MCP, if you wanted Claude to access your company's Salesforce data, someone had to build a custom integration. If you also wanted it to access Google Drive, someone had to build another custom integration. And if you switched from Claude to GPT, every integration had to be rebuilt from scratch. This is called the <strong>N×M problem</strong> — N AI models times M tools equals a lot of custom connectors.</p>
 <p>MCP standardizes this. An MCP <strong>server</strong> is a small program that exposes a tool or data source in a standardized format. An MCP <strong>client</strong> (built into the AI application) can connect to any MCP server. So a Salesforce MCP server works with Claude, GPT, Gemini, or any other AI that supports the protocol — just like a USB cable works with any USB device.</p>
@@ -1502,7 +1395,7 @@ const MODULES = [
 <div class="callout">
 <strong>Key principle:</strong> MCP is USB for AI — a universal standard for connecting AI models to external tools and data. It solves the integration problem that previously required custom code for every model-tool combination. If someone says "we have an MCP server for that," they mean the tool is ready for any MCP-compatible AI to use.
 </div>` },
-    { id: "9.4", title: "RAG, structured output, and grounding", body: `
+    { id: "8.4", title: "RAG, structured output, and grounding", body: `
 <p>Three concepts that come up constantly in AI product discussions:</p>
 <p><strong>RAG</strong> (Retrieval-Augmented Generation) is a technique where the AI searches for relevant information before generating a response. Instead of relying solely on what the model "knows" from training, RAG retrieves specific documents, database entries, or web pages and feeds them to the model as context. "Answer this question using the information in these three documents" is fundamentally more reliable than "answer this question from memory." RAG is how most enterprise AI products work — they search your company's knowledge base first, then generate a response grounded in your actual data.</p>
 <p><strong>Structured output</strong> means getting the AI to produce data in a specific, predictable format (usually JSON) rather than free-form text. If you're building a workflow where the AI extracts invoice data, you need it to return <code>{"vendor": "Acme", "amount": 1500, "date": "2025-03-15"}</code> — not a paragraph describing the invoice. Structured output turns AI from a conversational tool into a component you can plug into automated systems.</p>
@@ -1510,7 +1403,7 @@ const MODULES = [
 <div class="callout">
 <strong>Key principle:</strong> RAG is "look it up before answering." Structured output is "give me data, not prose." Grounding is "prove it." These three patterns are the building blocks of AI products that are actually reliable enough to trust.
 </div>` },
-    { id: "9.5", title: "Why demos lie and products are hard", body: `
+    { id: "8.5", title: "Why demos lie and products are hard", body: `
 <p>A demo is a controlled performance. A product is reality.</p>
 <p>In a demo, the prompt is carefully crafted. The data is clean. The edge cases are avoided. The model gets one chance to impress, and if it fails, the presenter runs it again. You see the best 5% of outputs. In a product, every user brings their own messy, ambiguous, unexpected input. The data is incomplete. The edge cases are the majority of real usage. The model has to work every time, and when it fails, there's no presenter to intervene — there's a frustrated user.</p>
 <p>The gap between demo and product includes: <strong>prompt engineering at scale</strong> (writing prompts that work for 1,000 different inputs, not just the one in the demo), <strong>error handling</strong> (what happens when the model generates garbage), <strong>cost management</strong> (each API call costs money, and costs add up fast at scale), <strong>latency</strong> (users expect responses in seconds, not minutes), <strong>safety</strong> (preventing the model from saying harmful things), <strong>evaluation</strong> (how do you even measure if the AI is doing a good job?), and <strong>edge cases</strong> (the weird inputs that break everything).</p>
@@ -1554,6 +1447,113 @@ const MODULES = [
         ],
         correct: 1,
         explanation: "RAG retrieves relevant documents or data first, then feeds them to the model as context. This grounds the response in real information rather than relying on the model's training data alone."
+      }
+    ]
+  }
+},
+
+// ─── MODULE 9 ───
+{
+  id: 9, title: "Inside AI Agents", time: "18 min",
+  lessons: [
+    { id: "9.1", title: "What people mean when they say 'agent'", body: `
+<p>The word "agent" is one of the most abused terms in tech. There's a real technical distinction, but it gets flattened in marketing. The clean definition: an <strong>agent</strong> is an LLM in a loop that uses tools and decides for itself when it's done. Control flow is determined by the model, not pre-scripted by you. That gives a three-tier taxonomy worth holding onto.</p>
+<p>A <strong>context wrapper</strong> (Custom GPTs, Google Gems, Claude Projects, OpenAI Assistants) is a system prompt plus some files and maybe a tool toggle. Not an agent. The user types something, the model responds, conversation continues turn-by-turn. No autonomous loop. Most "AI features" people build at this tier are basically project folders.</p>
+<p>A <strong>workflow</strong> is when you chain LLM calls together with predetermined logic. "Take the email → classify it → if urgent, draft reply → route to human for approval." You wrote the steps; the LLM fills in content at each node. Most "AI features" shipped in products today are workflows, even when marketed as agents.</p>
+<p>A <strong>true agent</strong> is when the LLM decides what to do next, calls a tool, looks at the result, decides what to do next, and keeps going until it judges the task complete. You give it a goal and a toolkit. It picks the path. Claude Code is the cleanest current example — you say "fix the bug in this function," and the model decides which files to read, which commands to run, when to stop.</p>
+<div class="callout">
+<strong>Key principle:</strong> Agency is a spectrum, not a checkbox. When someone says "we built an AI agent," ask which tier they actually mean. 90% of the time in corporate settings, they mean workflow and don't know the difference.
+</div>` },
+    { id: "9.2", title: "The three layers: brain, menu, hands", body: `
+<p>Every real agent stacks three layers. The <strong>brain</strong> is the LLM. The <strong>menu</strong> is the list of tool descriptions the model reads at inference time. The <strong>hands</strong> are the actual code that runs when the model decides to call a tool. Confusing these three is the most common vocabulary mistake among people who haven't built one.</p>
+<p>The <strong>brain</strong> decides. It reads the user's query, the available tool descriptions, and any prior context, and either answers directly or emits a structured tool call — usually a JSON blob saying "call tool X with these parameters." It does not, itself, do anything in the world. It produces text. The text gets interpreted by other code.</p>
+<p>The <strong>menu</strong> — tool descriptions — is what the model reads to decide which tool to use. Each tool has a name, a plain-English description of what it does, and a parameter schema. The brain only invokes a tool if its description matches the user's intent. This means writing good tool descriptions <em>is</em> agent engineering. A poorly described tool is a tool the model won't invoke at the right time, even though the code works fine.</p>
+<p>The <strong>hands</strong> — tool implementations — are real executable code. HTTP requests, file operations, database queries, shell commands. When the brain emits a tool call, a runtime parses it, executes the matching function, and feeds the result back into the brain's context for the next decision. The brain is rented from a model provider; the menu and hands are what you build.</p>
+<div class="callout">
+<strong>Key principle:</strong> A tool is real code. A tool description is the prompt about the code. The agent is the system. Using these words interchangeably is the tell that someone hasn't actually built one.
+</div>` },
+    { id: "9.3", title: "The agent loop", body: `
+<p>The three layers run together in a loop. The brain receives a query, decides whether to answer directly or invoke a tool, the tool runs, the result feeds back into context, and the brain decides again — until it judges the task complete and emits a final answer. This loop is what makes an agent <em>agentic</em>. A system that calls the LLM once and stops is not an agent. A system that loops, with the model controlling continuation, is.</p>
+<p>The decision to exit the loop is the model's, not the developer's. This is the key difference from a workflow. In a workflow, the developer wrote the steps; the LLM fills in content at each step; control flow is determined by the developer's logic. In an agent, the model is choosing the next action at every iteration. The developer provides tools and a goal; the model navigates.</p>
+<svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:480px;height:auto;display:block;margin:18px auto;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:12px" aria-label="Agent loop diagram">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--text-secondary)"/>
+    </marker>
+  </defs>
+  <rect x="20" y="90" width="80" height="40" rx="6" fill="none" stroke="var(--border-light)" stroke-width="1.5"/>
+  <text x="60" y="115" text-anchor="middle" fill="var(--text-secondary)" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12">Query</text>
+  <line x1="100" y1="110" x2="155" y2="110" stroke="var(--text-secondary)" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="160" y="85" width="100" height="50" rx="8" fill="none" stroke="var(--accent)" stroke-width="2"/>
+  <text x="210" y="115" text-anchor="middle" fill="var(--text)" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="600">Decide</text>
+  <line x1="260" y1="100" x2="320" y2="60" stroke="var(--text-secondary)" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="320" y="40" width="120" height="40" rx="6" fill="none" stroke="var(--border-light)" stroke-width="1.5"/>
+  <text x="380" y="65" text-anchor="middle" fill="var(--text)" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12">Tool runs</text>
+  <line x1="380" y1="80" x2="380" y2="135" stroke="var(--text-secondary)" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="320" y="140" width="120" height="40" rx="6" fill="none" stroke="var(--border-light)" stroke-width="1.5"/>
+  <text x="380" y="165" text-anchor="middle" fill="var(--text)" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12">Observe result</text>
+  <line x1="320" y1="160" x2="260" y2="120" stroke="var(--text-secondary)" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="210" y1="85" x2="210" y2="35" stroke="var(--text-secondary)" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrow)"/>
+  <text x="218" y="55" fill="var(--text-muted)" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10" font-style="italic">when done</text>
+  <rect x="20" y="10" width="120" height="40" rx="6" fill="none" stroke="var(--border-light)" stroke-width="1.5"/>
+  <text x="80" y="35" text-anchor="middle" fill="var(--text-secondary)" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12">Final answer</text>
+  <line x1="195" y1="35" x2="145" y2="35" stroke="var(--text-secondary)" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrow)"/>
+</svg>
+<p>In practice, this loop can run anywhere from one iteration (model decides no tool is needed, answers directly) to dozens of iterations (model researches, plans, executes, verifies, corrects). The longer the loop runs unattended, the more "agentic" the system is. Claude Code routinely runs loops with twenty or more tool calls before returning to the user. A customer service agent might take five. A simple Q&A bot takes one or zero.</p>
+<div class="callout">
+<strong>Key principle:</strong> The loop is the agent. Without the loop, you have a workflow. The model decides when to exit. That decision — exit or continue — is the part most teams under-engineer.
+</div>` },
+    { id: "9.4", title: "Tool routing and how agents fail", body: `
+<p>The hardest decision the brain makes is <strong>tool routing</strong> — given a query, which tool (if any) to invoke. This decision is driven entirely by the tool descriptions you wrote, the system prompt, and the model's training on structured outputs. Routing is also the most common place agents fail in production. Specifically: the model answers from its own training data when it should have called a tool.</p>
+<p>This failure pattern is called <strong>tool avoidance</strong>. It's especially common in small local models (8B–14B parameters) used in air-gapped enterprise deployments, because small models have stronger biases toward generating from their own weights. Ask a small model "who won the last Super Bowl" with web_search available, and it will often answer from its training data — confidently and wrongly. The tool was there. The brain didn't use it.</p>
+<p>The fix is <strong>grounding</strong> — tying the model's output to verified external information through tool calls instead of letting it generate from memory. You achieve this through better tool descriptions, sharper system prompts, and iteration. "Use web_search for any question about current events, scores, prices, or current people in roles" is a stronger description than "Search the web." Specificity in the menu drives correct routing in the brain.</p>
+<p>You surface these failures with <strong>eval probes</strong> — small batteries of test queries with known-correct answers that target the failure mode you're trying to catch. Two questions that work especially well for tool avoidance: "Who is the current president?" and "Who won the last Super Bowl?" — both have answers the model's training data is guaranteed to be stale on, so a correctly routing agent will hit web_search, and an avoiding agent will confabulate. Iterate until the probes pass. This is real eval-driven development.</p>
+<div class="callout">
+<strong>Key principle:</strong> Tool routing is where agents fail. Probe questions surface the failure. Iterating on tool descriptions and system prompts is how you fix it. This loop — probe, observe, iterate — is the unglamorous core of production agent engineering.
+</div>` },
+    { id: "9.5", title: "Vocabulary lock-in", body: `
+<p>Using the right words matters because vocabulary is how technical people screen for whether you've actually built something or just talked about it. "Agent" used loosely means nothing. "Tool routing failure on time-sensitive queries" used precisely means you've debugged one. The terms in this lesson are the difference between sounding like a tourist and sounding like someone who has shipped.</p>
+<p><strong>Tool, tool description, tool-calling protocol</strong> — three different things, often confused. The <em>tool</em> is the real code (the function that searches the web). The <em>tool description</em> is the JSON or plain-English schema you pass to the model so it knows the tool exists. The <em>tool-calling protocol</em> is the mechanism by which the model emits structured tool calls — OpenAI's function calling, Anthropic's tool use, and MCP (Model Context Protocol) are all protocols. Tools are capabilities; descriptions are prompts; protocols are wire formats.</p>
+<p><strong>MCP</strong> (Model Context Protocol) is the open standard for exposing tools to LLMs across vendors. If your tools are MCP-compatible, the same tools can be used by Claude, GPT, and other compliant models. <strong>Foundry</strong> is a manufacturing metaphor for industrial-grade build platforms — Azure AI Foundry, Palantir Foundry, Pivotal Cloud Foundry. The word signals "this is where production systems get cast," not "this is a sandbox." <strong>Autonomous system</strong> is the classical engineering term that "AI agent" maps to — a system that perceives, decides, and acts toward a goal without step-by-step human direction.</p>
+<p><strong>Frontier vs small models</strong> matters more than most people realize. Frontier models (Claude Opus, GPT-5, Gemini Pro) handle tool calling reliably out of the box. Small models (8B–14B parameters, Ollama-hosted, used in air-gapped environments) struggle with it. The gap between frontier and small models on tool-use accuracy is one of the largest capability differences in the industry. This is why enterprise agents in walled gardens — where you can't reach a frontier API — require dramatically more prompt engineering and eval work than consumer-facing agents that can hit GPT or Claude directly.</p>
+<div class="callout">
+<strong>Key principle:</strong> Vocabulary discipline is professional discipline. Using "tool" when you mean "integration," or "agent" when you mean "workflow," or "MCP" when you mean "function calling" makes you sound like a tourist. Using the right word makes you sound like someone who has built one.
+</div>` }
+  ],
+  scenario: {
+    situation: `A senior leader asks you to "build an AI agent" for the team's repetitive project management work — drafting weekly status updates, summarizing meeting notes, and flagging overdue tasks. The team has access to OpenAI's API. The company's data lives in SharePoint and Microsoft Teams. Budget is approved. They want a demo in three weeks.`,
+    prompt: "What's the first move?",
+    options: [
+      { text: "Start building an autonomous LLM-in-a-loop system with tool calls into SharePoint and Teams", id: "a" },
+      { text: "Clarify whether the leader wants a true agent (autonomous, harder to govern, more capable) or a workflow (you script the steps, the LLM fills in content, ships faster, easier to audit) — and confirm whether the company permits sending internal data to OpenAI's API", id: "b", correct: true },
+      { text: "Decline because public sector data sovereignty rules don't allow it", id: "c" },
+      { text: "Buy a vendor product instead of building anything internally", id: "d" }
+    ],
+    explanation: `90% of "build an AI agent" requests in corporate settings are actually workflow requests, and the requester doesn't know the difference. Clarifying the tier before scoping matters because the engineering, eval, and governance investments are wildly different. The second part — checking data permissions before designing the system — is the table-stakes enterprise question. The leader said "OpenAI's API," but you don't know yet if compliance has approved sending internal data there. Anyone who can ask both questions cleanly is doing real product work, not just demo-driven development.`
+  },
+  quiz: {
+    questions: [
+      {
+        q: `A vendor pitches you their "AI agent" for invoice processing. In the demo, it reads an invoice, extracts fields, checks them against a database, and routes for approval. When you ask how the system handles unusual edge cases, the vendor says "the workflow handles it." What did the vendor just reveal?`,
+        options: [
+          "It's a fully autonomous AI agent",
+          "It's a workflow with LLM components — the word \"agent\" was marketing language",
+          "It's a context wrapper around a chatbot",
+          "It's a retrieval-augmented generation system"
+        ],
+        correct: 1,
+        explanation: `The vendor's own language gave it away — they called it a workflow. The system has predetermined steps with LLM calls inside them. That's a workflow, not an autonomous agent. Both are useful, and workflows are often the right choice — but they have very different engineering, eval, and operational profiles. Spotting the giveaway language is a real professional skill in vendor conversations.`
+      },
+      {
+        q: `A small open-source model in your air-gapped agent is given a web_search tool. When asked "Who is the current president?", it answers from its 2023 training data — confidently and wrongly. What is this failure called, and what's the fix?`,
+        options: [
+          "Hallucination — fix it by switching to a larger model",
+          "Tool avoidance — fix it by iterating on the tool description and system prompt until the model reliably routes time-sensitive queries to web_search",
+          "Latency timeout — fix it by giving the tool more time to respond",
+          "Context overflow — fix it by reducing the input size"
+        ],
+        correct: 1,
+        explanation: `This specific failure — model answers from parametric memory instead of invoking an available tool — is called tool avoidance. It's especially common in small models because they have stronger biases toward generating from their own training data. The fix is prompt engineering on the tool description and the system prompt, plus eval probes (queries with known-current answers) to surface the failure reliably during iteration. Switching to a larger model also fixes it but isn't an option in air-gapped environments.`
       }
     ]
   }
@@ -1649,10 +1649,11 @@ const MODULES = [
 // ═══════════════════════════════════════════════════════
 
 const STORAGE_KEY = 'techFluencyV2Progress';
-const MIGRATION_FLAG = 'techFluencyAgentsMigrationDone';
+const MIGRATION_FLAG = 'techFluencyAgentsV2MigrationDone';
 
-// One-time migration: when Module 5 "Inside AI Agents" was inserted, modules 5–10
-// shifted to 6–11. Rewrite saved lesson/module IDs so returning users keep progress.
+// One-time migration: Module 9 "Inside AI Agents" was inserted after "AI Products
+// Are Still Software". Modules 1–8 keep their IDs; old Module 9 (Talk) → 10 and old
+// Module 10 (Putting) → 11. Rewrite saved lesson/module IDs so returning users keep progress.
 (function migrateProgressForAgentsModule() {
   try {
     if (localStorage.getItem(MIGRATION_FLAG)) return;
@@ -1664,16 +1665,16 @@ const MIGRATION_FLAG = 'techFluencyAgentsMigrationDone';
           const m = /^(\d+)(\..+)$/.exec(id);
           if (!m) return id;
           const n = parseInt(m[1], 10);
-          return n >= 5 && n <= 10 ? (n + 1) + m[2] : id;
+          return n >= 9 && n <= 10 ? (n + 1) + m[2] : id;
         };
         const shiftModuleKey = k => {
           const n = parseInt(k, 10);
-          return (!isNaN(n) && n >= 5 && n <= 10) ? String(n + 1) : k;
+          return (!isNaN(n) && n >= 9 && n <= 10) ? String(n + 1) : k;
         };
         const remapObj = (obj, keyFn) => {
           if (!obj || typeof obj !== 'object') return obj;
           const out = {};
-          // Migrate highest-numbered keys first so 5→6 doesn't overwrite an existing 6.
+          // Migrate highest-numbered keys first so 9→10 doesn't overwrite an existing 10.
           const sorted = Object.keys(obj).sort((a, b) => {
             const na = parseInt(a, 10), nb = parseInt(b, 10);
             return (isNaN(nb) ? 0 : nb) - (isNaN(na) ? 0 : na);
