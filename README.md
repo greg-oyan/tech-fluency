@@ -13,13 +13,14 @@ Most nontechnical professionals are told to “learn to code” when what they a
 
 ## What You'll Learn
 
-The training covers 20 lessons across 5 modules:
+The training covers 43 lessons across 11 modules:
 
 1. **What Software Actually Is** — State, logic, and interface. Frontend vs backend. How web apps work. The building blocks (HTML, CSS, JavaScript).
 2. **How Software Gets Built** — Git and version control. Branches, commits, and pull requests. Local vs deployed environments. Why estimates are always wrong.
 3. **The Stuff That Makes It Hard** — APIs. Databases and persistence. Permissions and edge cases. Technical debt.
 4. **AI Products Are Still Software** — Probabilistic models vs deterministic systems. Prompts, workflows, and agents. Retrieval, structured output, and tools. Why demos lie and products are hard.
-5. **How to Talk to Technical People** — Good questions vs bad questions. Signals that build or destroy credibility. Knowing when you're out of your depth.
+5. **Inside AI Agents** — The agent taxonomy. The three architectural layers (brain, menu, hands). The agent loop. Tool routing, grounding, and how agents fail. The vocabulary.
+6. **How to Talk to Technical People** — Good questions vs bad questions. Signals that build or destroy credibility. Knowing when you're out of your depth.
 
 ## Features
 
